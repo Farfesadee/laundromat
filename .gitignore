@@ -1,0 +1,32 @@
+# Dependencies
+web/node_modules/
+backend/.venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+
+# Build output
+web/.next/
+web/out/
+backend/build/
+backend/dist/
+
+# Local databases (never commit data)
+*.db
+*.sqlite
+*.sqlite3
+
+# Secrets (examples are committed, real values never)
+backend/.env
+web/.env.local
+web/.env*.local
+*.pem
+*.key
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+web/tsconfig.tsbuildinfo

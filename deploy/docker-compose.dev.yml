@@ -1,0 +1,9 @@
+version: "3.9"
+services:
+  postgres:
+    image: postgres:16-alpine
+    ports: ["5432:5432"]
+    environment: [POSTGRES_DB=spinease, POSTGRES_USER=spinease, POSTGRES_PASSWORD=spinease]
+  redis:
+    image: redis:7-alpine
+    ports: ["6379:6379"]
