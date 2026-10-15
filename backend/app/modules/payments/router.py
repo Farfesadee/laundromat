@@ -43,7 +43,7 @@ def paystack_init(body: dict, db: Session = Depends(get_db), p: dict = Depends(g
     o = db.query(Order).get(body.get("order_id", ""))
     if not o:
         raise HTTPException(404, "Order not found")
-    ref = f"SPX-{o.order_no}-{uuid.uuid4().hex[:8]}"
+    ref = f"LMT-{o.order_no}-{uuid.uuid4().hex[:8]}"
     # Real implementation: POST https://api.paystack.co/transaction/initialize with secret key.
     # MVP returns a checkout URL the frontend can redirect to; webhook confirms.
     url = f"https://checkout.paystack.com/{ref}"

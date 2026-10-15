@@ -1,5 +1,5 @@
 """
-Spinease queue engine - reference implementation (pure function, no I/O).
+LAUNDROMAT queue engine: reference implementation (pure function, no I/O).
 
 Given a snapshot of the store (machines + in-flight washes + ordered queue),
 project when and where every queued wash unit will start/finish.

@@ -40,12 +40,14 @@ def list_users(db: Session = Depends(get_db), _p: dict = Depends(require_role("m
     return [{"id": u.id, "email": u.email, "name": u.name, "role": u.role, "active": u.is_active}
             for u in db.query(User).all()]
 
-@router.post("/users")
+@router.post("/users", status_code=201)
 def create_user(body: dict, db: Session = Depends(get_db), p: dict = Depends(require_role("owner"))):
     if db.query(User).filter(User.email == body.get("email")).first():
         raise HTTPException(400, "Email exists")
+    if not body.get("password"):
+        raise HTTPException(400, "password is required. The owner must set an initial password.")
     u = User(email=body["email"], name=body.get("name", ""), role=body.get("role", "staff"),
-             password_hash=sec.hash_password(body.get("password", "spinease123")),
+             password_hash=sec.hash_password(body["password"]),
              pin_hash=sec.hash_pin(body["pin"]) if body.get("pin") else "")
     db.add(u)
     audit(db, p.get("sub"), "user.create", "user", body["email"], None, {"role": u.role})

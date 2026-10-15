@@ -3,7 +3,7 @@ services:
   postgres:
     image: postgres:16-alpine
     ports: ["5432:5432"]
-    environment: [POSTGRES_DB=spinease, POSTGRES_USER=spinease, POSTGRES_PASSWORD=spinease]
+    environment: [POSTGRES_DB=laundromat, POSTGRES_USER=laundromat, POSTGRES_PASSWORD=laundromat]
   redis:
     image: redis:7-alpine
     ports: ["6379:6379"]

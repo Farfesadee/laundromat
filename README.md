@@ -1,8 +1,8 @@
-# Spinease
+# LAUNDROMAT
 
-**Laundry · Coffee · Relax**: a web-based CRM, live queue, POS and operations system for a self-service laundromat.
+**Wash · Dry · Relax**: a web-based CRM, live queue, POS and operations system for a self-service laundromat.
 
-Spinease mirrors the physical store in real time. Customers join *today's* queue (no appointments), staff run washers and dryers from a tablet, the in-store TV shows who is up next, and the owner sees expected vs actual money at any moment.
+LAUNDROMAT mirrors the physical store in real time. Customers join *today's* queue (no appointments), staff run washers and dryers from a tablet, the in-store TV shows who is up next, and the owner sees expected vs actual money at any moment.
 
 > **Core principle:** if a machine is busy in the store, it is busy in the CRM. The CRM is the single source of truth for customers, queue, machines, sales, payments and daily operations.
 
@@ -149,7 +149,7 @@ Full algorithm, grace-period handling, drop-off modes and test strategy: [`docs/
 Target structure (the queue engine prototype already exists):
 
 ```text
-spinease/
+laundromat/
 ├── README.md
 ├── docs/
 │   └── ARCHITECTURE.md
@@ -202,7 +202,7 @@ spinease/
 ### 1. Clone and configure
 
 ```bash
-git clone <repo-url> spinease && cd spinease
+git clone <repo-url> laundromat && cd laundromat
 cp backend/.env.example backend/.env
 cp web/.env.example web/.env.local
 ```
@@ -259,7 +259,7 @@ ngrok http 8000
 | Variable | Description |
 |---|---|
 | `APP_ENV` | `local` / `staging` / `production` |
-| `DATABASE_URL` | `postgresql+asyncpg://user:pass@localhost:5432/spinease` |
+| `DATABASE_URL` | `postgresql+asyncpg://user:pass@localhost:5432/laundromat` |
 | `REDIS_URL` | `redis://localhost:6379/0` |
 | `JWT_SECRET` | Long random string |
 | `JWT_ACCESS_MINUTES` | Default `15` |
@@ -318,7 +318,7 @@ Sensitive actions (restart, refund, close day) require a manager PIN and are wri
 
 ## Deployment
 
-1. Provision a **Namecheap VPS** (Ubuntu, 2 vCPU / 4 GB RAM minimum) and point `spinease.com` and `api.spinease.com` DNS to it.
+1. Provision a **Namecheap VPS** (Ubuntu, 2 vCPU / 4 GB RAM minimum) and point `laundromat.com` and `api.laundromat.com` DNS to it.
 2. Install Docker and Docker Compose.
 3. Copy `deploy/` and the production `.env` files to the server.
 4. Run:
@@ -329,7 +329,7 @@ docker compose exec api alembic upgrade head
 ```
 
 5. Caddy issues TLS certificates automatically.
-6. Configure the Paystack **live** webhook: `https://api.spinease.com/api/v1/webhooks/paystack`.
+6. Configure the Paystack **live** webhook: `https://api.laundromat.com/api/v1/webhooks/paystack`.
 7. Schedule `deploy/backup.sh` (nightly `pg_dump` to off-site storage) and test a restore.
 8. Open `/tv?token=<device-token>` in Chrome kiosk mode on the store TV.
 
@@ -380,4 +380,4 @@ Highest-priority coverage: the **queue engine** (golden scenarios + property tes
 
 ## License
 
-Proprietary. © Spinease. All rights reserved.
+Proprietary. © LAUNDROMAT. All rights reserved.

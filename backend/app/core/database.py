@@ -9,7 +9,7 @@ from app.core.config import settings
 url = settings.DATABASE_URL
 # Allow running from repo root or backend/ : normalise sqlite relative path to backend/
 if url.startswith("sqlite") and not url.startswith("sqlite:////"):
-    # sqlite:///./spinease.db -> place next to backend/
+    # sqlite:///./laundromat.db -> place next to backend/
     db_file = url.split("sqlite:///")[-1]
     if not os.path.isabs(db_file):
         here = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))

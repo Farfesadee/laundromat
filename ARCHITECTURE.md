@@ -1,8 +1,8 @@
-# Spinease: System Architecture
+# LAUNDROMAT: System Architecture
 
 > Version 1.0 · MVP scope · Timezone `Africa/Lagos` · Currency NGN (stored in kobo)
 
-This document is the technical source of truth for building the Spinease laundromat CRM, queue, POS and operations system. The product requirements live in the original brief; the screens are the 14 UI mockups. The most critical component, the **queue engine**, is specified in [section 5](#5-the-queue-engine-most-critical-component) and has a runnable prototype in `backend/app/queue/engine.py`.
+This document is the technical source of truth for building the LAUNDROMAT CRM, queue, POS and operations system. The product requirements live in the original brief; the screens are the 14 UI mockups. The most critical component, the **queue engine**, is specified in [section 5](#5-the-queue-engine-most-critical-component) and has a runnable prototype in `backend/app/queue/engine.py`.
 
 ---
 
@@ -93,7 +93,7 @@ flowchart LR
 
 ```mermaid
 flowchart TB
-  DNS[Namecheap DNS<br/>spinease.com] --> CF[Optional: Cloudflare proxy]
+  DNS[Namecheap DNS<br/>laundromat.com] --> CF[Optional: Cloudflare proxy]
   CF --> VPS
   subgraph VPS["Namecheap VPS (Ubuntu, 2 vCPU / 4 GB min)"]
     CD[Caddy :443]
@@ -108,7 +108,7 @@ flowchart TB
 ```
 
 - **Docker Compose** services: `caddy`, `web`, `api`, `worker`, `postgres`, `redis`.
-- **Domains:** `spinease.com` (web, QR landing), `api.spinease.com` (API/WebSocket).
+- **Domains:** `laundromat.com` (web, QR landing), `api.laundromat.com` (API/WebSocket).
 - **TLS:** automatic via Caddy.
 - **Backups:** nightly `pg_dump` to off-site storage (e.g., S3-compatible). Test a restore before launch.
 - **Environments:** `local`, `staging` (small VPS or same VPS, separate compose project, Paystack *test* keys), `production`.
