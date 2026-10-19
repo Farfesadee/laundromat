@@ -104,15 +104,22 @@ def create_order(body: dict, db: Session = Depends(get_db), p: dict = Depends(ge
     channel = body.get("channel", "in_store")
     raw_phone = (body.get("phone") or "").strip()
     phone = sec.normalize_phone(raw_phone) if raw_phone else None
+    email = (body.get("email") or "").strip().lower()
+    if email and ("@" not in email or "." not in email.split("@")[-1]):
+        raise HTTPException(400, "Enter a valid email address")
     customer_id = body.get("customer_id")
+    if not customer_id and p.get("role") == "customer":
+        customer_id = p.get("sub")
     c = db.get(Customer, customer_id) if customer_id else None
     if not c and phone:
         c = db.query(Customer).filter(Customer.phone == phone).first()
     if not c:
-        c = Customer(store_id=_s.STORE_ID, phone=phone,
+        c = Customer(store_id=_s.STORE_ID, phone=phone, email=email,
                      preferred_name=(body.get("preferred_name") or "Walk-in").strip()[:60],
                      first_name=(body.get("preferred_name") or "").strip()[:60], registered_via=channel)
         db.add(c); db.flush()
+    elif email and not c.email:
+        c.email = email
     day = _today(db)
     if otype == "self_service" and not day.accepting_bookings:
         raise HTTPException(409, "Today's queue is currently closed. Please return tomorrow from 8:00 AM.")
@@ -120,7 +127,7 @@ def create_order(body: dict, db: Session = Depends(get_db), p: dict = Depends(ge
     no = _next_order_no(db)
     addons = body.get("addons", [])
     subtotal = washes_n * svc.unit_price + sum(int(a.get("unit_price", 0)) * int(a.get("qty", 1)) for a in addons)
-    status = "booked" if channel == "in_store" else "pending_payment"
+    status = "booked" if channel != "online" else "pending_payment"
     if body.get("paid") is True:
         status = "booked"
     o = Order(order_no=no, customer_id=c.id, operating_day_id=day.id, type=otype, channel=channel,
@@ -135,11 +142,15 @@ def create_order(body: dict, db: Session = Depends(get_db), p: dict = Depends(ge
         db.add(OrderItem(order_id=o.id, service_id=s2.id if s2 else svc.id,
                          qty=int(a.get("qty", 1)), unit_price=int(a.get("unit_price", 0)),
                          line_total=int(a.get("unit_price", 0)) * int(a.get("qty", 1))))
-    if otype == "self_service":
+    # Online card orders only open the queue after Paystack confirms payment.
+    # Pay-in-store orders (in_store channel) join the queue immediately.
+    if otype == "self_service" and status == "booked":
         _create_units(db, o, washes_n, _max_seq(db) + 1)
     db.commit()
-    recompute(db)
-    return {"id": o.id, "order_no": no, "status": o.status, "total": o.total}
+    if status == "booked":
+        recompute(db)
+    return {"id": o.id, "order_no": no, "status": o.status, "total": o.total,
+            "payment_required": status == "pending_payment"}
 
 @orders.get("/{oid}")
 def get_order(oid: str, db: Session = Depends(get_db), _p: dict = Depends(get_current_principal)):

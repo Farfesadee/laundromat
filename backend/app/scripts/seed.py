@@ -60,13 +60,13 @@ def seed() -> dict:
 
         if settings.is_local and settings.SEED_DEMO and db.query(User).count() == 0:
             admin_email = settings.SEED_ADMIN_EMAIL or f"owner-{secrets.token_hex(3)}@example.com"
-            admin_pw = settings.SEED_ADMIN_PASSWORD or secrets.token_urlsafe(12)
-            admin_pin = settings.SEED_ADMIN_PIN or f"{secrets.randbelow(9000) + 1000:04d}"
-            staff_pw = secrets.token_urlsafe(12)
+            admin_pw = settings.SEED_ADMIN_PASSWORD or sec.random_password()
+            admin_pin = settings.SEED_ADMIN_PIN or sec.random_dev_pin()
+            staff_pw = sec.random_password()
             db.add(User(store_id=settings.STORE_ID, email=admin_email, name="Owner", role="owner",
                         password_hash=sec.hash_password(admin_pw), pin_hash=sec.hash_pin(admin_pin)))
             db.add(User(store_id=settings.STORE_ID, email="manager@example.com", name="Manager", role="manager",
-                        password_hash=sec.hash_password(secrets.token_urlsafe(12)), pin_hash=sec.hash_pin(admin_pin)))
+                        password_hash=sec.hash_password(sec.random_password()), pin_hash=sec.hash_pin(admin_pin)))
             db.add(User(store_id=settings.STORE_ID, email="staff@example.com", name="Staff", role="staff",
                         password_hash=sec.hash_password(staff_pw)))
             db.commit()

@@ -35,6 +35,29 @@ def _staff(c):
 def _sign(body: bytes):
     return hmac.new(settings.PAYSTACK_SECRET_KEY.encode(), body, hashlib.sha512).hexdigest()
 
+def test_online_order_opens_queue_only_after_payment():
+    c = _client(); h = _staff(c)
+    r = c.post("/api/v1/orders", json={"phone": "+2348031234599", "preferred_name": "Online",
+                                       "washes": 2, "channel": "online"}, headers=h)
+    assert r.status_code == 200, r.text
+    body = r.json(); oid = body["id"]
+    assert body["payment_required"] is True
+    assert all(u["order_id"] != oid for u in c.get("/api/v1/queue", headers=h).json())
+    event = {"event": "charge.success", "data": {"reference": "REF-ONLINE-1", "amount": body["total"],
+             "status": "success", "metadata": {"order_id": oid, "washes": 2}}}
+    raw = json.dumps(event).encode()
+    hd = {"x-paystack-signature": _sign(raw), "Content-Type": "application/json"}
+    assert c.post("/api/v1/webhooks/paystack", content=raw, headers=hd).status_code == 200
+    queued = [u for u in c.get("/api/v1/queue", headers=h).json() if u["order_id"] == oid]
+    assert len(queued) == 2
+
+
+def test_store_status_reports_payment_mode():
+    c = _client()
+    r = c.get("/api/v1/store/status")
+    assert r.status_code == 200 and "payments_online" in r.json()
+
+
 def test_webhook_replay_and_mismatch():
     c = _client(); h = _staff(c)
     r = c.post("/api/v1/orders", json={"phone": "+2348031234500", "preferred_name": "Webby",

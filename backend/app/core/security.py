@@ -159,3 +159,13 @@ def verify_paystack_signature(raw_body: bytes, signature: str | None) -> bool:
 
 def random_dev_pin() -> str:
     return f"{secrets.randbelow(9000) + 1000:04d}"
+
+
+def random_password(length: int = 16) -> str:
+    """URL-safe random password that always satisfies validate_password."""
+    import string
+    alphabet = string.ascii_letters + string.digits
+    while True:
+        pw = "".join(secrets.choice(alphabet) for _ in range(length))
+        if re.search(r"[A-Za-z]", pw) and re.search(r"[0-9]", pw):
+            return pw

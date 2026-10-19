@@ -53,7 +53,7 @@ export const api = {
   estimate: (washes: number) => req<{ wait_minutes: number | null; first_start: string | null; accepting: boolean }>(`/queue/estimate?washes=${washes}`),
   publicQueue: () => req<{ now_serving: any[]; coming_up: any[] }>(`/queue/public`),
   services: () => req<{ id: string; kind: string; name: string; unit_price: number }[]>(`/services`),
-  storeStatus: () => req<{ accepting: boolean; dropoff_open: boolean; dropoff_capacity: number; wait_minutes: number | null }>(`/store/status`),
+  storeStatus: () => req<{ accepting: boolean; dropoff_open: boolean; dropoff_capacity: number; wait_minutes: number | null; payments_online: boolean }>(`/store/status`),
 };
 
 const KEY = 'laundromat_token';

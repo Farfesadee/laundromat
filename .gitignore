@@ -18,6 +18,7 @@ backend/dist/
 
 # Secrets (examples are committed, real values never)
 backend/.env
+deploy/.env
 web/.env.local
 web/.env*.local
 *.pem

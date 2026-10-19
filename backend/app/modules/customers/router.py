@@ -73,12 +73,14 @@ def store_status(db: Session = Depends(get_db)):
     from datetime import datetime, timezone
     day = db.query(OperatingDay).order_by(OperatingDay.date.desc()).first()
     est = estimate_for_new_booking(db, 1, datetime.now(timezone.utc))
+    from app.core.config import settings as _s
     return {"accepting": bool(day.accepting_bookings if day else True),
             "dropoff_open": bool(day.dropoff_open if day else True),
             "dropoff_capacity": (day.dropoff_capacity if day else 10),
             "wait_minutes": est.get("wait_minutes"),
             "queue_open": day.queue_opens_at if day else "08:00",
-            "queue_close": day.queue_closes_at if day else "19:30"}
+            "queue_close": day.queue_closes_at if day else "19:30",
+            "payments_online": bool(_s.paystack_configured)}
 
 @store.patch("/status")
 def store_patch(body: dict, db: Session = Depends(get_db), p: dict = Depends(require_role("staff"))):

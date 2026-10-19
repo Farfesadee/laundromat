@@ -10,7 +10,6 @@
     "test": "echo \"web: no unit tests yet (Playwright covers E2E)\""
   },
   "dependencies": {
-    "@next/swc-win32-x64-msvc": "^14.2.5",
     "next": "14.2.5",
     "react": "18.3.1",
     "react-dom": "18.3.1"

@@ -65,5 +65,12 @@ class Settings:
     def is_local(self) -> bool:
         return self.APP_ENV == "local"
 
+    @property
+    def paystack_configured(self) -> bool:
+        key = (self.PAYSTACK_SECRET_KEY or "").strip()
+        if self.is_local:
+            return key.startswith("sk_")
+        return key.startswith(("sk_test_", "sk_live_")) and key != "sk_test_unconfigured"
+
 
 settings = Settings()

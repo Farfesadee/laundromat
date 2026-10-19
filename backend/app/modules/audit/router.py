@@ -20,7 +20,8 @@ def me(p: dict = Depends(get_current_principal), db: Session = Depends(get_db)):
             orders = [{"id": o.id, "order_no": o.order_no, "status": o.status, "total": o.total}
                       for o in db.query(Order).filter(Order.customer_id == c.id).order_by(Order.created_at.desc()).limit(20).all()]
         return {"id": p["sub"], "role": "customer",
-                "preferred_name": c.preferred_name if c else "", "orders": orders}
+                "preferred_name": c.preferred_name if c else "",
+                "phone": c.phone if c else "", "email": c.email if c else "", "orders": orders}
     u = db.query(User).get(p["sub"])
     return {"id": p["sub"], "role": p.get("role"), "email": u.email if u else "", "name": u.name if u else ""}
 
