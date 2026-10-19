@@ -87,6 +87,11 @@ curl -sS https://api.laundromat.accredit.vip/healthz
 curl -sS -o /dev/null -w '%{http_code}\n' https://laundromat.accredit.vip/
 ```
 
+The web server returns 404 for `/_next/image`. The site serves plain `<img>`
+assets, so the Next image optimizer endpoint is not needed and closing it
+removes that attack surface. If you adopt `next/image` later, upgrade Next.js
+to a release with the optimizer fixes before removing this block.
+
 ## Paystack
 
 Set in `/opt/laundromat/deploy/.env`:
