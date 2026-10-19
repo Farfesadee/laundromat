@@ -37,6 +37,12 @@ def _otp_login(c: TestClient, phone: str):
     assert r.status_code == 200, r.text
     return r.json()
 
+def test_phone_normalises_to_e164():
+    assert sec.normalize_phone("+2348031234567") == "+2348031234567"
+    assert sec.normalize_phone("+234 803 123 4567") == "+2348031234567"
+    assert sec.normalize_phone("08031234567") == "+2348031234567"
+
+
 def test_otp_happy_path_and_single_use():
     c = _fresh()
     phone = "+2348011111111"

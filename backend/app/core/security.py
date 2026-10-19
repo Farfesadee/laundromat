@@ -93,8 +93,7 @@ def normalize_phone(raw: str) -> str:
         num = phonenumbers.parse(s, "NG" if s.startswith("0") else None)
         if not phonenumbers.is_possible_number(num) or not phonenumbers.is_valid_number(num):
             raise ValueError("invalid")
-        return phonenumbers.format_in_original_format(num, phonenumbers.PhoneNumberFormat.E164) \
-            if s.startswith("+") else phonenumbers.format_number(num, phonenumbers.PhoneNumberFormat.E164)
+        return phonenumbers.format_number(num, phonenumbers.PhoneNumberFormat.E164)
     except ImportError:
         if not re.fullmatch(r"\+\d{7,15}", s):
             raise HTTPException(400, "Phone must be E.164 (e.g. +2348012345678)")
