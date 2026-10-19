@@ -1,6 +1,7 @@
 // API client with no mock data. Failures surface as typed errors with
 // loading/empty states in the UI. Base URL comes from the environment.
-const BASE = (process.env.NEXT_PUBLIC_API_URL || '').replace(/\/$/, '');
+export const API_BASE = (process.env.NEXT_PUBLIC_API_URL || '').replace(/\/$/, '');
+const BASE = API_BASE;
 if (!BASE && typeof window !== 'undefined') {
   // eslint-disable-next-line no-console
   console.warn('NEXT_PUBLIC_API_URL is not set');

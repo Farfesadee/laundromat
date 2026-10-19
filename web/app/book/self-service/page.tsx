@@ -25,17 +25,17 @@ export default function SelfService() {
       <div className="card text-center">
         <div className="flex items-center justify-center gap-5 my-2">
           <button className="btn !w-12 !rounded-full" onClick={() => setN(Math.max(1, n - 1))} aria-label="fewer">−</button>
-          <span className="text-5xl font-extrabold text-[#0a1633]">{n}</span>
+          <span className="text-5xl font-semibold text-ink">{n}</span>
           <button className="btn !w-12 !rounded-full" onClick={() => setN(Math.min(20, n + 1))} aria-label="more">+</button>
         </div>
         {price != null && <p className="text-sm text-slate-500">{kobo(price)} per wash · total {kobo(price * n)}</p>}
-        <div className="rounded-2xl bg-gradient-to-br from-cyan-50 to-amber-50 border border-cyan-100 mt-4 p-4">
+        <div className="rounded-lg bg-paper border border-line mt-4 p-4">
           <p className="label">Estimated wait</p>
-          <p className="text-3xl font-extrabold">~ {est?.wait_minutes ?? '…'} min</p>
+          <p className="text-3xl font-semibold text-ink">~ {est?.wait_minutes ?? '…'} min</p>
           {!est?.accepting && <p className="text-sm text-rose-600 font-semibold mt-1">Today&apos;s queue is currently closed.</p>}
         </div>
         {error && <div className="mt-3"><ErrorBox message={error} retry={() => window.location.reload()} /></div>}
-        <p className="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-xl p-2.5 mt-3">
+        <p className="text-xs text-[#7a5a2a] bg-[#f7f1e6] border border-[#e6d7c1] rounded-lg p-2.5 mt-3">
           Arrive at least 10 minutes before your estimated turn, or your wash may be skipped.
         </p>
         <Link className="btn w-full mt-4" href={`/book/add-ons?washes=${n}`}>Continue</Link>

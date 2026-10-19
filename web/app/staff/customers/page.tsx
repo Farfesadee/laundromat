@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import { ApiError, api, tokens } from '../../../lib/api';
 import { PageHeader } from '../../../components/ui';
+import { PhoneField } from '../../../components/phone-field';
 
 export default function StaffCustomers() {
   const [q, setQ] = useState('');
@@ -50,7 +51,13 @@ export default function StaffCustomers() {
             <input className="input" placeholder="First name" value={form.first_name} onChange={e => setForm({ ...form, first_name: e.target.value })} />
             <input className="input" placeholder="In-store name" value={form.preferred_name} onChange={e => setForm({ ...form, preferred_name: e.target.value })} />
           </div>
-          <input className="input" placeholder="Phone (+234…)" value={form.phone} onChange={e => setForm({ ...form, phone: e.target.value })} inputMode="tel" />
+          <PhoneField
+            id="crm-phone"
+            label="Phone number"
+            value={form.phone}
+            onChange={value => setForm({ ...form, phone: value })}
+            hint="Pick the country, then enter the number."
+          />
           <input className="input" placeholder="Email (optional)" value={form.email} onChange={e => setForm({ ...form, email: e.target.value })} inputMode="email" />
           {error && <p className="text-sm text-rose-600">{error}</p>}
           {msg && <p className="text-sm text-emerald-700">{msg}</p>}

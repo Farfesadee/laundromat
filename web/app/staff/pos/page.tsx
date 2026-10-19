@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react';
 import { ApiError, api, kobo, tokens } from '../../../lib/api';
 import { ErrorBox, PageHeader } from '../../../components/ui';
+import { PhoneField } from '../../../components/phone-field';
 
 export default function POS() {
   const [services, setServices] = useState<any[]>([]);
@@ -40,9 +41,9 @@ export default function POS() {
       {error && <div className="mb-3"><ErrorBox message={error} /></div>}
       <div className="grid md:grid-cols-[1.4fr_1fr] gap-3">
         <div className="card">
-          <div className="grid grid-cols-2 gap-2">
+          <div className="grid gap-2">
             <input className="input" placeholder="Customer name" value={name} onChange={e => setName(e.target.value)} />
-            <input className="input" placeholder="Phone (+234…)" value={phone} onChange={e => setPhone(e.target.value)} inputMode="tel" />
+            <PhoneField id="pos-phone" label="Customer phone" value={phone} onChange={setPhone} hint="Optional. Pick the country, then enter the number." />
           </div>
           <div className="mt-3 space-y-2">
             {services.map(s => (

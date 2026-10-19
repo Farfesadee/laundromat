@@ -27,6 +27,12 @@ class Settings:
     JWT_ACCESS_MINUTES: int = _env_int("JWT_ACCESS_MINUTES", 15)
     JWT_REFRESH_DAYS: int = _env_int("JWT_REFRESH_DAYS", 7)
     PAYSTACK_CALLBACK_URL: str = _env("PAYSTACK_CALLBACK_URL", "http://localhost:3000/checkout/callback")
+    FRONTEND_URL: str = _env("FRONTEND_URL", "http://localhost:3000").rstrip("/")
+    PUBLIC_API_URL: str = _env("PUBLIC_API_URL", "http://localhost:8000/api/v1").rstrip("/")
+    GOOGLE_CLIENT_ID: str = _env("GOOGLE_CLIENT_ID", "")
+    GOOGLE_CLIENT_SECRET: str = _env("GOOGLE_CLIENT_SECRET", "")
+    GOOGLE_REDIRECT_URI: str = _env("GOOGLE_REDIRECT_URI", "")
+    SMS_ENABLED: bool = _env("SMS_ENABLED", "false").lower() in ("1", "true", "yes")
     STORE_TIMEZONE: str = _env("STORE_TIMEZONE", "Africa/Lagos")
     STORE_ID: str = _env("STORE_ID", "store-1")
     CORS_ORIGINS: list[str] = [o.strip() for o in _env("CORS_ORIGINS", "http://localhost:3000").split(",") if o.strip()]
@@ -71,6 +77,20 @@ class Settings:
         if self.is_local:
             return key.startswith("sk_")
         return key.startswith(("sk_test_", "sk_live_")) and key != "sk_test_unconfigured"
+
+    @property
+    def google_oauth_configured(self) -> bool:
+        return bool(self.GOOGLE_CLIENT_ID.strip() and self.GOOGLE_CLIENT_SECRET.strip())
+
+    @property
+    def google_redirect_uri(self) -> str:
+        if self.GOOGLE_REDIRECT_URI.strip():
+            return self.GOOGLE_REDIRECT_URI.strip()
+        return f"{self.PUBLIC_API_URL}/auth/google/callback"
+
+    @property
+    def sms_configured(self) -> bool:
+        return bool(self.SMS_ENABLED)
 
 
 settings = Settings()

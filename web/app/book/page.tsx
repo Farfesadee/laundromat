@@ -15,12 +15,12 @@ export default function Book() {
       <div className="grid md:grid-cols-3 gap-3">
         {CARDS.map(({ h, t, d, Icon }) => (
           <Link key={t} href={h} className="card card-hover text-center py-8 group">
-            <span className="mx-auto w-14 h-14 rounded-2xl bg-gradient-to-br from-cyan-500 to-cyan-700 text-white grid place-items-center shadow-lg group-hover:scale-105 transition">
+            <span className="mx-auto grid h-14 w-14 place-items-center rounded-lg bg-accent-soft text-accent transition group-hover:bg-accent group-hover:text-white">
               <Icon className="w-7 h-7" />
             </span>
-            <p className="font-extrabold text-lg mt-3">{t}</p>
-            <p className="text-sm text-slate-500 mt-1">{d}</p>
-            <p className="inline-flex items-center gap-1 text-sm font-bold text-cyan-700 mt-3">
+            <p className="font-semibold text-lg mt-3">{t}</p>
+            <p className="text-sm text-muted mt-1">{d}</p>
+            <p className="inline-flex items-center gap-1 text-sm font-semibold text-accent mt-3">
               Continue <ArrowRightIcon className="w-4 h-4" />
             </p>
           </Link>

@@ -102,6 +102,22 @@ export function ArrowRightIcon({ className = '' }: P) {
   );
 }
 
+export function MenuIcon({ className = '' }: P) {
+  return (
+    <Base className={className}>
+      <path d="M4 7h16M4 12h16M4 17h16" />
+    </Base>
+  );
+}
+
+export function CloseIcon({ className = '' }: P) {
+  return (
+    <Base className={className}>
+      <path d="m6 6 12 12M18 6 6 18" />
+    </Base>
+  );
+}
+
 export function UserIcon({ className = '' }: P) {
   return (
     <Base className={className}>

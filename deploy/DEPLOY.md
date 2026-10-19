@@ -112,6 +112,79 @@ Subscribe to `charge.success`. Card checkout stays hidden while the key is
 `unconfigured`; pay-in-store still works, and no fake checkout URL is
 produced.
 
+## Customer accounts
+
+Customers sign in with their email address and password. The sign in page
+also shows a Google button when Google OAuth is configured, and a phone code
+option only when `SMS_ENABLED=true`.
+
+Registration collects first name, last name, email address, phone number, and
+password. Phone numbers are stored in E.164 form. The phone field groups the
+country selector with the number and shows the country flag from bundled SVG
+assets, so the same form works for customers outside Nigeria.
+
+`NEXT_PUBLIC_DEFAULT_COUNTRY` sets the initial country (ISO 3166-1 alpha-2,
+default `NG`). It is compiled into the web bundle, so rebuild the web image
+after changing it.
+
+For an existing database, run the idempotent migration before the new API
+starts handling requests:
+
+```bash
+cd /opt/laundromat/deploy
+docker compose --env-file .env -f docker-compose.prod.yml build api
+docker compose --env-file .env -f docker-compose.prod.yml run --rm api \
+  python -m app.scripts.migrate_customer_auth
+docker compose --env-file .env -f docker-compose.prod.yml up -d
+```
+
+It adds `customers.password_hash`, `customers.google_sub`, the unique Google
+subject index, and the `login_codes` table. It is safe to run more than once.
+
+## Google sign in
+
+Create a Google Cloud project and configure an OAuth consent screen:
+
+1. Add the app name, support email, and authorized domain `accredit.vip`.
+2. Add the scopes `openid`, `email`, and `profile`.
+3. Create an OAuth client ID of type **Web application**.
+4. Add this exact Authorized redirect URI:
+
+```text
+https://api.laundromat.accredit.vip/api/v1/auth/google/callback
+```
+
+5. Add `https://laundromat.accredit.vip` as an Authorized JavaScript origin.
+
+Put the credentials in `/opt/laundromat/deploy/.env`:
+
+```text
+FRONTEND_URL=https://laundromat.accredit.vip
+PUBLIC_API_URL=https://api.laundromat.accredit.vip/api/v1
+GOOGLE_CLIENT_ID=...
+GOOGLE_CLIENT_SECRET=...
+GOOGLE_REDIRECT_URI=https://api.laundromat.accredit.vip/api/v1/auth/google/callback
+```
+
+`GOOGLE_REDIRECT_URI` is optional when `PUBLIC_API_URL` is already correct.
+Restart the API after changing it:
+
+```bash
+docker compose --env-file .env -f docker-compose.prod.yml up -d api
+```
+
+The login page reads `/api/v1/auth/providers` at runtime. The Google button
+appears only when both client values are set, so no web rebuild is needed
+after adding credentials. Test the full flow in a private window and confirm
+the browser returns to `/auth/google/callback#code=...` before landing on
+`/book`.
+
+## Phone code sign in
+
+`SMS_ENABLED=false` by default. While it is false, the phone code option stays
+hidden and no customer is invited into a flow that cannot deliver a code.
+Set it to `true` only after an SMS provider adapter is wired and tested.
+
 ## Operations
 
 ```bash
@@ -145,11 +218,15 @@ Copy backups off the server and test a restore before launch.
 cd /opt/laundromat
 git pull
 cd deploy
-docker compose --env-file .env -f docker-compose.prod.yml up -d --build
+docker compose --env-file .env -f docker-compose.prod.yml build
+docker compose --env-file .env -f docker-compose.prod.yml run --rm api \
+  python -m app.scripts.migrate_customer_auth
+docker compose --env-file .env -f docker-compose.prod.yml up -d
 ```
 
 The database volume is named `laundromat_pg_data`; rebuilding containers
-does not delete it.
+does not delete it. The migration is idempotent, so it belongs in every
+update even when no schema change is expected.
 
 ## Before real customers
 
@@ -157,6 +234,8 @@ does not delete it.
 2. Set real service prices and machine counts in the owner screens.
 3. Set `PAYSTACK_SECRET_KEY` and test one live or test-mode payment.
 4. Provision the TV device token as a manager and open `/tv?token=...`.
-5. Configure the SMS and email sender adapters. Until then, notifications
+5. Add Google OAuth credentials and test one sign in with a real Google account.
+6. Connect an SMS provider before setting `SMS_ENABLED=true`.
+7. Configure the SMS and email sender adapters. Until then, notifications
    are stored in-app only.
-6. Schedule and test a database backup.
+8. Schedule and test a database backup.

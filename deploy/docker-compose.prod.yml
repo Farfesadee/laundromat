@@ -41,6 +41,7 @@ services:
       args:
         NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:?NEXT_PUBLIC_API_URL is required}
         NEXT_PUBLIC_WS_URL: ${NEXT_PUBLIC_WS_URL:?NEXT_PUBLIC_WS_URL is required}
+        NEXT_PUBLIC_DEFAULT_COUNTRY: ${NEXT_PUBLIC_DEFAULT_COUNTRY:-NG}
     restart: unless-stopped
     depends_on:
       api:

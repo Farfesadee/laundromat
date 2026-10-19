@@ -18,7 +18,7 @@ function Board({ rows, title, tone }: { rows: any[]; title: string; tone: string
               <td className="py-2.5 text-white/80 tabular-nums">{r.displayTime || '-'}</td>
               <td className="font-extrabold tv-glow">{r.name}</td>
               <td className="text-white/80">{r.machine}</td>
-              <td className="text-right"><span className="badge bg-white/15 text-cyan-200">{r.status}</span></td>
+              <td className="text-right"><span className="badge bg-white/15 text-[#b8dde0]">{r.status}</span></td>
             </tr>
           ))}
         </tbody>
@@ -71,13 +71,13 @@ function Inner() {
     <div className="rounded-3xl overflow-hidden bg-[#070d22] text-white p-6 md:p-8 grid md:grid-cols-[1.4fr_1fr] gap-8 min-h-[70vh]">
       <div>
         <div className="flex items-center justify-between">
-          <p className="font-extrabold text-xl tracking-tight">LAUNDROMAT <span className="text-[11px] font-medium text-cyan-300 tracking-[.2em]">WASH · DRY · RELAX</span></p>
-          <p className="text-cyan-200 text-sm tabular-nums">{clock}</p>
+          <p className="font-extrabold text-xl tracking-tight">LAUNDROMAT <span className="text-[11px] font-medium text-[#b8dde0] tracking-[.2em]">WASH · DRY · RELAX</span></p>
+          <p className="text-[#9fd3d6] text-sm tabular-nums">{clock}</p>
         </div>
-        <div className="mt-5"><Board rows={q.now_serving} title="NOW SERVING" tone="text-amber-300" /></div>
-        <div className="mt-6"><Board rows={q.coming_up} title="COMING UP" tone="text-cyan-300" /></div>
+        <div className="mt-5"><Board rows={q.now_serving} title="NOW SERVING" tone="text-[#d9b98a]" /></div>
+        <div className="mt-6"><Board rows={q.coming_up} title="COMING UP" tone="text-[#b8dde0]" /></div>
       </div>
-      <div className="rounded-2xl bg-gradient-to-b from-cyan-500/20 to-amber-400/10 border border-white/10 p-6 flex flex-col justify-center text-center">
+      <div className="rounded-2xl bg-[#0f2a2e] border border-white/10 p-6 flex flex-col justify-center text-center">
         <p className="text-4xl font-extrabold leading-tight">Fresh laundry,<br />happier days.</p>
         <p className="text-white/60 mt-4 text-sm">Please be near your machine 10 minutes before your time.</p>
       </div>

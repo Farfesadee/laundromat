@@ -71,7 +71,7 @@ export default function Orders() {
                 </div>
               </div>
             ))}
-            <p className="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-xl p-2.5">Arrive at least 10 minutes before your estimated turn.</p>
+            <p className="text-xs text-[#7a5a2a] bg-[#f7f1e6] border border-[#e6d7c1] rounded-lg p-2.5">Arrive at least 10 minutes before your estimated turn.</p>
           </div>
         ) : (
           <div className="space-y-2.5">

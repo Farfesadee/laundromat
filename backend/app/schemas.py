@@ -2,20 +2,23 @@
 from __future__ import annotations
 from datetime import datetime
 from typing import Any, Optional
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, EmailStr, Field
 
 class RegisterIn(BaseModel):
-    first_name: str = ""
-    last_name: str = ""
-    preferred_name: str = ""
+    first_name: str = Field(min_length=1, max_length=80)
+    last_name: str = Field(default="", max_length=80)
+    preferred_name: str = Field(default="", max_length=80)
     phone: str
-    email: str = ""
-    password: Optional[str] = None
+    email: EmailStr
+    password: str = Field(min_length=8, max_length=128)
 
 class LoginIn(BaseModel):
     phone: str = ""
     email: str = ""
     password: Optional[str] = None
+
+class GoogleExchangeIn(BaseModel):
+    code: str
 
 class StaffLoginIn(BaseModel):
     email: str

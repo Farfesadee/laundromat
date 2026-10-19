@@ -5,6 +5,7 @@ import { ApiError, api, kobo, tokens } from '../../lib/api';
 import { useAuth } from '../../lib/auth';
 import { ErrorBox, PageHeader, Steps } from '../../components/ui';
 import { ArrowRightIcon } from '../../components/icons';
+import { PhoneField, isValidPhoneNumber } from '../../components/phone-field';
 
 export const dynamic = 'force-dynamic';
 
@@ -78,9 +79,15 @@ function Inner() {
           <p>Self-service washes × {washes} <span className="text-slate-400">·</span> <b>{kobo(total)}</b></p>
           <p className="font-extrabold mt-1">Total {kobo(total)}</p>
         </div>
-        <div className="grid grid-cols-2 gap-2">
+        <div className="grid gap-3">
           <div><p className="label mb-1">Your name</p><input className="input" value={name} onChange={e => setName(e.target.value)} placeholder="In-store name" /></div>
-          <div><p className="label mb-1">Phone</p><input className="input" value={phone} onChange={e => setPhone(e.target.value)} placeholder="+234…" inputMode="tel" /></div>
+          <PhoneField
+            id="checkout-phone"
+            label="Phone number"
+            value={phone}
+            onChange={setPhone}
+            hint="We use this to contact you about this order."
+          />
         </div>
         <div>
           <p className="label mb-1">Email {payOnline ? '' : '(optional)'}</p>
@@ -89,7 +96,7 @@ function Inner() {
         </div>
         <div className="space-y-1.5">
           {methods.map(m => (
-            <label key={m} className={`flex gap-2 items-center rounded-xl border p-3 text-sm cursor-pointer ${method === m ? 'border-cyan-600 bg-cyan-50' : 'border-slate-200'}`}>
+            <label key={m} className={`flex gap-2 items-center rounded-lg border p-3 text-sm cursor-pointer ${method === m ? 'border-accent bg-accent-soft' : 'border-line'}`}>
               <input type="radio" checked={method === m} onChange={() => setMethod(m)} />{m}
             </label>
           ))}
@@ -101,10 +108,10 @@ function Inner() {
             {done.payUrl
               ? <><p className="mt-1">Complete payment with Paystack, then track your wash.</p><a className="btn w-full mt-2" href={done.payUrl}>Pay with Paystack</a></>
               : <p className="mt-1">Pay {kobo(done.total)} in-store when you arrive.</p>}
-            <a className="mt-2 flex items-center justify-center gap-1 text-center font-bold text-cyan-700" href="/orders">Track my washes <ArrowRightIcon className="w-4 h-4" /></a>
+            <a className="mt-2 flex items-center justify-center gap-1 text-center font-semibold text-accent" href="/orders">Track my washes <ArrowRightIcon className="w-4 h-4" /></a>
           </div>
         ) : (
-          <button className="btn w-full" disabled={busy || !phone || !name || (method === CARD && !email)} onClick={pay}>{busy ? 'Creating order…' : method === CARD ? `Pay ${kobo(total)}` : `Place order · pay in store`}</button>
+          <button className="btn w-full" disabled={busy || !phone || !isValidPhoneNumber(phone) || !name || (method === CARD && !email)} onClick={pay}>{busy ? 'Creating order…' : method === CARD ? `Pay ${kobo(total)}` : `Place order · pay in store`}</button>
         )}
         <p className="text-[11px] text-slate-400 text-center">Secured by Paystack · verified by server webhook</p>
       </div>

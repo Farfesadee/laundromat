@@ -1,26 +1,32 @@
+import 'react-phone-number-input/style.css';
 import './globals.css';
 import type { Metadata } from 'next';
 import { AuthProvider } from '../lib/auth';
 import { Nav } from './nav';
+import { SiteFooter } from '../components/site-footer';
 
 export const metadata: Metadata = {
-  title: 'LAUNDROMAT | Wash · Dry · Relax',
-  description: 'Same-day self-service laundry: live queue, washers, dryers, coffee.',
+  title: 'LAUNDROMAT | Self-service laundry, without the wait',
+  description:
+    'Reserve a washer, follow the live queue, and collect fresh laundry the same day. Self-service laundry with secure payments and real support.',
+  openGraph: {
+    title: 'LAUNDROMAT | Self-service laundry, without the wait',
+    description:
+      'Reserve a washer, follow the live queue, and collect fresh laundry the same day.',
+    type: 'website',
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <body className="min-h-screen">
+      <body className="flex min-h-screen flex-col">
         <AuthProvider>
           <Nav />
-          <main className="max-w-6xl mx-auto px-4 pb-16 pt-6">{children}</main>
-          <footer className="border-t border-slate-200 bg-white/70 backdrop-blur">
-            <div className="max-w-6xl mx-auto px-4 py-5 flex flex-wrap gap-2 items-center justify-between text-xs text-slate-500">
-              <span className="font-bold text-[#0a1633]">LAUNDROMAT</span>
-              <span>Wash · Dry · Relax. Please arrive at least 10 minutes before your estimated turn.</span>
-            </div>
-          </footer>
+          <main className="mx-auto w-full max-w-6xl flex-1 px-5 py-6 sm:px-6 sm:py-8">
+            {children}
+          </main>
+          <SiteFooter />
         </AuthProvider>
       </body>
     </html>

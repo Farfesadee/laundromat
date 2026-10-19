@@ -2,8 +2,8 @@
 from __future__ import annotations
 import uuid
 from datetime import datetime, timezone
-from sqlalchemy import (BigInteger, Boolean, Column, DateTime, ForeignKey, Integer,
-                        JSON, String, Text, UniqueConstraint)
+from sqlalchemy import (BigInteger, Boolean, Column, DateTime, ForeignKey, Index, Integer,
+                        JSON, String, Text, UniqueConstraint, func)
 from app.core.database import Base
 
 
@@ -33,12 +33,27 @@ class Customer(Base):
     preferred_name = Column(String, default="")
     phone = Column(String, unique=True, index=True, nullable=True)
     email = Column(String, default="")
+    password_hash = Column(String, default="")
+    google_sub = Column(String, unique=True, index=True, nullable=True)
     registered_via = Column(String, default="in_store")
     registered_by_user_id = Column(String, default="")
     phone_verified_at = Column(DateTime, nullable=True)
     segment = Column(String, default="new")
     created_at = Column(DateTime, default=now)
     updated_at = Column(DateTime, default=now, onupdate=now)
+
+
+# Email is the customer sign in identity, so it must be unique even when the
+# database collation is case sensitive. Empty emails are allowed for customers
+# who registered in store or with a phone code only.
+Index(
+    "ix_customers_email_lower_unique",
+    func.lower(Customer.email),
+    unique=True,
+    postgresql_where=Customer.email.isnot(None) & (Customer.email != ""),
+    sqlite_where=Customer.email.isnot(None) & (Customer.email != ""),
+)
+
 
 class User(Base):
     __tablename__ = "users"
@@ -246,6 +261,22 @@ class OtpChallenge(Base):
     attempts = Column(Integer, default=0)
     consumed = Column(Boolean, default=False)
     request_ip = Column(String, default="")
+    created_at = Column(DateTime, default=now)
+
+
+class LoginCode(Base):
+    """Short-lived, single-use code used to hand Google sign in back to the web app.
+
+    Only the hash is stored. The raw code travels in the URL fragment to the
+    frontend, then is exchanged for a normal token pair.
+    """
+    __tablename__ = "login_codes"
+    id = Column(String, primary_key=True, default=uid)
+    store_id = Column(String, default=default_store_id, index=True)
+    code_hash = Column(String, unique=True, index=True)
+    customer_id = Column(String, index=True)
+    expires_at = Column(DateTime)
+    consumed = Column(Boolean, default=False)
     created_at = Column(DateTime, default=now)
 
 

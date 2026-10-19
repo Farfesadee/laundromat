@@ -132,6 +132,27 @@ def decode_token(token: str, expect: str = "access") -> dict:
         raise ValueError(f"Expected {expect} token")
     return data
 
+
+def create_oauth_state() -> str:
+    """Short-lived signed state for the Google OAuth redirect (CSRF protection)."""
+    now = datetime.now(timezone.utc)
+    payload = {
+        "type": "oauth_state",
+        "jti": uuid.uuid4().hex,
+        "iat": int(now.timestamp()),
+        "exp": int((now + timedelta(minutes=10)).timestamp()),
+    }
+    return _encode(payload)
+
+
+def random_login_code() -> str:
+    """High-entropy, URL-safe code for handing a completed OAuth login to the web app."""
+    return secrets.token_urlsafe(32)
+
+
+def hash_login_code(code: str) -> str:
+    return hashlib.sha256(f"{settings.JWT_SECRET}:login-code:{code}".encode()).hexdigest()
+
 # ---------- OTP ----------
 
 def generate_otp_code() -> str:
