@@ -318,22 +318,34 @@ Sensitive actions (restart, refund, close day) require a manager PIN and are wri
 
 ## Deployment
 
-1. Provision a **Namecheap VPS** (Ubuntu, 2 vCPU / 4 GB RAM minimum) and point `laundromat.com` and `api.laundromat.com` DNS to it.
-2. Install Docker and Docker Compose.
-3. Copy `deploy/` and the production `.env` files to the server.
-4. Run:
+The production host runs LAUNDROMAT beside existing applications, with its
+own Docker project, private Postgres volume, loopback ports, and nginx
+server blocks. See [`deploy/DEPLOY.md`](deploy/DEPLOY.md) for the full
+checklist.
+
+Summary:
+
+1. Point `laundromat.accredit.vip` and `api.laundromat.accredit.vip` (A
+   records) at the VPS.
+2. Copy the repository to `/opt/laundromat` and fill
+   `deploy/.env.production.example` into `deploy/.env`.
+3. Build and start the isolated stack:
 
 ```bash
-docker compose -f deploy/docker-compose.yml up -d --build
-docker compose exec api alembic upgrade head
+cd /opt/laundromat/deploy
+docker compose --env-file .env -f docker-compose.prod.yml up -d --build
+docker compose --env-file .env -f docker-compose.prod.yml run --rm api python -m app.scripts.seed
+docker compose --env-file .env -f docker-compose.prod.yml run --rm api python -m app.scripts.create_owner
 ```
 
-5. Caddy issues TLS certificates automatically.
-6. Configure the Paystack **live** webhook: `https://api.laundromat.com/api/v1/webhooks/paystack`.
-7. Schedule `deploy/backup.sh` (nightly `pg_dump` to off-site storage) and test a restore.
-8. Open `/tv?token=<device-token>` in Chrome kiosk mode on the store TV.
+4. Obtain a certificate with certbot and install
+   `deploy/nginx/laundromat.tls.conf`.
+5. Set the Paystack webhook to
+   `https://api.laundromat.accredit.vip/api/v1/webhooks/paystack`.
+6. Schedule and test a `pg_dump` backup, then open `/tv?token=<device-token>`
+   in Chrome kiosk mode on the store TV.
 
-CI/CD via GitHub Actions: lint → test → build → deploy → migrate.
+CI/CD via GitHub Actions: lint, test, build, deploy.
 
 ---
 

@@ -1,5 +1,8 @@
 #!/bin/sh
-set -e
+set -eu
+cd "$(dirname "$0")"
 DATE=$(date +%F)
-docker compose -f deploy/docker-compose.yml exec -T postgres pg_dump -U laundromat laundromat | gzip > "laundromat-$DATE.sql.gz"
-echo "Backup written: laundromat-$DATE.sql.gz. Verify with a restore before launch."
+docker compose --env-file .env -f docker-compose.prod.yml exec -T db \
+  pg_dump -U "${POSTGRES_USER:-laundromat}" "${POSTGRES_DB:-laundromat}" \
+  | gzip > "laundromat-$DATE.sql.gz"
+echo "Backup written: laundromat-$DATE.sql.gz. Copy it off the server and test a restore."
