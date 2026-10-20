@@ -178,11 +178,11 @@ Restart the API after changing it:
 docker compose --env-file .env -f docker-compose.prod.yml up -d api
 ```
 
-The login page reads `/api/v1/auth/providers` at runtime. The Google button
-appears only when both client values are set, so no web rebuild is needed
-after adding credentials. Test the full flow in a private window and confirm
-the browser returns to `/auth/google/callback#code=...` before landing on
-`/book`.
+The sign in and create account pages read `/api/v1/auth/providers` at
+runtime. The Google button appears on both pages only when both client values
+are set, so no web rebuild is needed after adding credentials. Test the full
+flow in a private window and confirm the browser returns to
+`/auth/google/callback#code=...` before landing on `/book`.
 
 ## Phone code sign in
 

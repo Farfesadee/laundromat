@@ -44,6 +44,14 @@ def test_phone_normalises_to_e164():
     assert sec.normalize_phone("08031234567") == "+2348031234567"
 
 
+def test_auth_providers_is_not_cached():
+    c = _fresh()
+    r = c.get("/api/v1/auth/providers")
+    assert r.status_code == 200
+    assert r.headers.get("cache-control") == "no-store"
+    assert r.json()["password"] is True
+
+
 def test_otp_happy_path_and_single_use():
     c = _fresh()
     phone = "+2348011111111"
