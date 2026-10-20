@@ -85,7 +85,7 @@ def close_day(date: str, body: dict, db: Session = Depends(get_db), p: dict = De
     d = db.query(OperatingDay).filter(OperatingDay.date == date).first()
     if not d:
         from fastapi import HTTPException
-        raise HTTPException(404, "Day not found")
+        raise HTTPException(404, "We could not find that operating day. It may have been removed.")
     exp, act = _expected(db), _actual(db)
     snap = {"date": date, "expected": exp, "actual": act, "notes": body.get("notes", ""),
             "closed_by": p.get("sub", ""), "closed_at": datetime.utcnow().isoformat()}

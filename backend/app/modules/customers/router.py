@@ -26,7 +26,7 @@ def list_customers(q: str = "", db: Session = Depends(get_db), _p: dict = Depend
 def create_customer(body: dict, db: Session = Depends(get_db), p: dict = Depends(require_role("staff"))):
     phone = sec.normalize_phone(body.get("phone", ""))
     if db.query(Customer).filter(Customer.phone == phone).first():
-        raise HTTPException(409, "Phone already registered")
+        raise HTTPException(409, "That phone number is already registered. Try signing in instead.")
     c = Customer(store_id=get_store_id(), first_name=body.get("first_name", "").strip()[:60],
                  last_name=body.get("last_name", "").strip()[:60],
                  preferred_name=(body.get("preferred_name") or body.get("first_name") or phone).strip()[:60],
@@ -41,7 +41,7 @@ def create_customer(body: dict, db: Session = Depends(get_db), p: dict = Depends
 def get_customer(cid: str, db: Session = Depends(get_db), _p: dict = Depends(require_role("staff"))):
     c = db.query(Customer).get(cid)
     if not c:
-        raise HTTPException(404, "Not found")
+        raise HTTPException(404, "We could not find that customer. They may have been removed.")
     orders = db.query(Order).filter(Order.customer_id == cid).all()
     paid = sum((p.amount for o in orders for p in db.query(Payment).filter(Payment.order_id == o.id, Payment.kind == "payment").all()), 0)
     return {"id": c.id, "preferred_name": c.preferred_name, "first_name": c.first_name,
@@ -58,7 +58,7 @@ def list_services(db: Session = Depends(get_db)):
 def update_service(sid: str, body: dict, db: Session = Depends(get_db), p: dict = Depends(require_role("owner"))):
     s = db.query(Service).get(sid)
     if not s:
-        raise HTTPException(404, "Not found")
+        raise HTTPException(404, "We could not find that service. It may have been removed.")
     before = {"unit_price": s.unit_price, "name": s.name}
     if "unit_price" in body: s.unit_price = int(body["unit_price"])
     if "name" in body: s.name = body["name"]
@@ -86,7 +86,7 @@ def store_status(db: Session = Depends(get_db)):
 def store_patch(body: dict, db: Session = Depends(get_db), p: dict = Depends(require_role("staff"))):
     day = db.query(OperatingDay).order_by(OperatingDay.date.desc()).first()
     if not day:
-        raise HTTPException(404, "No operating day")
+        raise HTTPException(404, "There is no open day to update. Please refresh and try again.")
     for k in ("accepting_bookings", "dropoff_open", "dropoff_capacity"):
         if k in body:
             setattr(day, k, body[k])

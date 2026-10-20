@@ -156,7 +156,7 @@ def create_order(body: dict, db: Session = Depends(get_db), p: dict = Depends(ge
 def get_order(oid: str, db: Session = Depends(get_db), _p: dict = Depends(get_current_principal)):
     o = db.query(Order).get(oid)
     if not o:
-        raise HTTPException(404, "Not found")
+        raise HTTPException(404, "We could not find that order. It may have been removed.")
     units = db.query(WashUnit).filter(WashUnit.order_id == oid).all()
     items = db.query(OrderItem).filter(OrderItem.order_id == oid).all()
     pays = db.query(Payment).filter(Payment.order_id == oid).all()
@@ -170,7 +170,7 @@ def get_order(oid: str, db: Session = Depends(get_db), _p: dict = Depends(get_cu
 def check_in(oid: str, db: Session = Depends(get_db), p: dict = Depends(require_role("staff"))):
     o = db.query(Order).get(oid)
     if not o:
-        raise HTTPException(404, "Not found")
+        raise HTTPException(404, "We could not find that order. It may have been removed.")
     o.status = "checked_in"; o.checked_in_at = datetime.now(timezone.utc)
     for u in db.query(WashUnit).filter(WashUnit.order_id == oid, WashUnit.status == "grace").all():
         u.status = "queued"; u.grace_started_at = None; u.grace_expires_at = None  # grace cancelled on arrival
@@ -182,7 +182,7 @@ def check_in(oid: str, db: Session = Depends(get_db), p: dict = Depends(require_
 def cancel_order(oid: str, db: Session = Depends(get_db), p: dict = Depends(require_role("staff"))):
     o = db.query(Order).get(oid)
     if not o:
-        raise HTTPException(404, "Not found")
+        raise HTTPException(404, "We could not find that order. It may have been removed.")
     o.status = "cancelled"
     for u in db.query(WashUnit).filter(WashUnit.order_id == oid).all():
         if u.status in ("queued", "grace"):
@@ -195,7 +195,7 @@ def cancel_order(oid: str, db: Session = Depends(get_db), p: dict = Depends(requ
 def _wu(db: Session, wid: str) -> WashUnit:
     u = db.query(WashUnit).get(wid)
     if not u:
-        raise HTTPException(404, "Wash unit not found")
+        raise HTTPException(404, "We could not find that wash. It may have been removed.")
     return u
 
 @washes.post("/{wid}/start")
@@ -203,7 +203,7 @@ def start_wash(wid: str, body: dict, db: Session = Depends(get_db), p: dict = De
     u = _wu(db, wid); mid = body.get("machine_id")
     m = db.query(Machine).get(mid) if mid else None
     if m and m.status == "maintenance":
-        raise HTTPException(409, "Machine in maintenance")
+        raise HTTPException(409, "That machine is in maintenance. Choose another one.")
     u.status = "washing"; u.wash_started_at = datetime.now(timezone.utc)
     if m:
         m.status = "running"; m.current_wash_unit_id = u.id
@@ -307,7 +307,7 @@ def restart(wid: str, body: dict, db: Session = Depends(get_db), p: dict = Depen
         if usr.pin_hash and sec.verify_pin(pin, usr.pin_hash):
             ok = True; by = usr.email; break
     if not ok:
-        raise HTTPException(403, "Manager PIN required")
+        raise HTTPException(403, "Enter your manager PIN to continue.")
     u = _wu(db, wid)
     u.wash_started_at = datetime.now(timezone.utc); u.status = "washing"
     mid = body.get("machine_id") or u.washer_id
@@ -333,7 +333,7 @@ def list_machines(db: Session = Depends(get_db)):
 def patch_machine(mid: str, body: dict, db: Session = Depends(get_db), p: dict = Depends(require_role("staff"))):
     m = db.query(Machine).get(mid)
     if not m:
-        raise HTTPException(404, "Not found")
+        raise HTTPException(404, "We could not find that machine. It may have been removed.")
     before = {"status": m.status}
     m.status = body.get("status", m.status)
     if body.get("reason") is not None:

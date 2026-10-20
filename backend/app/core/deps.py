@@ -31,7 +31,10 @@ def get_current_principal(
     db: Session = Depends(get_db),
 ) -> dict:
     if creds is None:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Missing credentials")
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Please sign in to continue.",
+        )
     try:
         data = decode_token(creds.credentials, expect="access")
     except Exception:
@@ -51,9 +54,12 @@ def get_current_principal(
         c = db.query(Customer).filter(Customer.id == sub).first()
         active, name = (c is not None), (c.preferred_name if c else "")
     else:
-        raise HTTPException(status_code=403, detail="Unknown role")
+        raise HTTPException(403, detail="Your account role is not recognized. Contact an administrator.")
     if not active:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Account disabled")
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="This account is disabled. Contact an administrator.",
+        )
     return {"sub": sub, "role": role, "name": name, "jti": data.get("jti", ""), "ip": _client_ip(request)}
 
 
@@ -62,7 +68,7 @@ def require_role(*roles: str):
 
     def _dep(principal: dict = Depends(get_current_principal)) -> dict:
         if ROLE_RANK.get(principal.get("role", "customer"), 0) < want:
-            raise HTTPException(status_code=403, detail="Insufficient permissions")
+            raise HTTPException(403, detail="You do not have access to that.")
         return principal
 
     return _dep

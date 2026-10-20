@@ -31,7 +31,7 @@ def list_devices(db: Session = Depends(get_db), _p: dict = Depends(require_role(
 def revoke(label: str, db: Session = Depends(get_db), p: dict = Depends(require_role("manager"))):
     rows = db.query(DeviceToken).filter(DeviceToken.store_id == get_store_id(), DeviceToken.label == label).all()
     if not rows:
-        raise HTTPException(404, "Unknown device")
+        raise HTTPException(404, "We could not find that device. It may have been removed.")
     for r in rows:
         r.is_active = False
     audit(db, p.get("sub"), "device.revoke", "device", label, None, None, store_id=get_store_id())

@@ -36,9 +36,9 @@ def _paystack_key() -> str:
 def _order_for(db: Session, oid: str, principal: dict) -> Order:
     o = db.query(Order).get(oid)
     if not o:
-        raise HTTPException(404, "Order not found")
+        raise HTTPException(404, "We could not find that order. It may have been removed.")
     if principal.get("role") == "customer" and o.customer_id != principal.get("sub"):
-        raise HTTPException(403, "This order belongs to another customer")
+        raise HTTPException(403, "This order belongs to another customer.")
     return o
 
 
@@ -85,7 +85,7 @@ def _apply_success(db: Session, o: Order, reference: str, amount: int, metadata:
 def record_payment(oid: str, body: dict, db: Session = Depends(get_db), p: dict = Depends(require_role("staff"))):
     o = db.query(Order).get(oid)
     if not o:
-        raise HTTPException(404, "Order not found")
+        raise HTTPException(404, "We could not find that order. It may have been removed.")
     amount = int(body.get("amount", 0))
     if amount <= 0:
         raise HTTPException(400, "Enter an amount greater than zero.")
@@ -106,19 +106,19 @@ def record_payment(oid: str, body: dict, db: Session = Depends(get_db), p: dict 
 def paystack_init(body: dict, db: Session = Depends(get_db), p: dict = Depends(get_current_principal)):
     key = _paystack_key()
     if not key:
-        raise HTTPException(503, "Card payments are not configured yet. Choose pay in store.")
+        raise HTTPException(503, "Card payments are not available right now. Choose pay in store.")
     o = _order_for(db, body.get("order_id", ""), p)
     if o.status == "cancelled":
-        raise HTTPException(409, "This order was cancelled")
+        raise HTTPException(409, "This order has been cancelled. Please start a new booking.")
     if o.payment_status == "paid":
-        raise HTTPException(409, "This order is already paid")
+        raise HTTPException(409, "This order is already paid. You can track it from My washes.")
     if int(o.total) <= 0:
         raise HTTPException(400, "This order has no total to charge. Please add an item first.")
 
     customer = db.query(Customer).get(o.customer_id)
     email = (body.get("email") or (customer.email if customer else "") or "").strip().lower()
     if "@" not in email or "." not in email.split("@")[-1]:
-        raise HTTPException(400, "A valid email address is required for card payment")
+        raise HTTPException(400, "Enter a valid email address to pay by card.")
     if customer and not customer.email:
         customer.email = email
         db.commit()
@@ -145,14 +145,14 @@ def paystack_init(body: dict, db: Session = Depends(get_db), p: dict = Depends(g
         data = res.json()
     except (httpx.HTTPError, ValueError):
         _mark_failed(db, reference)
-        raise HTTPException(502, "Could not reach Paystack. Please try again.")
+        raise HTTPException(502, "We could not reach the payment provider. Please try again.")
     if res.status_code >= 400 or not data.get("status"):
         _mark_failed(db, reference)
-        raise HTTPException(502, data.get("message") or "Paystack could not start this payment")
+        raise HTTPException(502, "We could not start card payment. Please try another method.")
     auth = (data.get("data") or {}).get("authorization_url")
     if not auth:
         _mark_failed(db, reference)
-        raise HTTPException(502, "Paystack did not return a checkout URL")
+        raise HTTPException(502, "We could not start card payment. Please try another method.")
     return {"authorization_url": auth, "reference": reference, "amount": int(o.total), "email": email}
 
 
@@ -168,22 +168,22 @@ def paystack_verify(reference: str = Query(..., min_length=6), db: Session = Dep
     """Verify a callback reference directly with Paystack. Safe to call twice."""
     key = _paystack_key()
     if not key:
-        raise HTTPException(503, "Card payments are not configured")
+        raise HTTPException(503, "Card payments are not available right now. Choose pay in store.")
     pay = db.query(Payment).filter(Payment.paystack_reference == reference).first()
     if not pay:
-        raise HTTPException(404, "Unknown payment reference")
+        raise HTTPException(404, "We could not find that payment.")
     o = db.query(Order).get(pay.order_id)
     if not o:
-        raise HTTPException(404, "Order not found")
+        raise HTTPException(404, "We could not find that order. It may have been removed.")
     try:
         with httpx.Client(timeout=PAYSTACK_TIMEOUT) as client:
             res = client.get(f"{PAYSTACK_API}/transaction/verify/{reference}",
                              headers={"Authorization": f"Bearer {key}"})
         data = res.json()
     except (httpx.HTTPError, ValueError):
-        raise HTTPException(502, "Could not reach Paystack. Please try again.")
+        raise HTTPException(502, "We could not reach the payment provider. Please try again.")
     if res.status_code >= 400 or not data.get("status"):
-        raise HTTPException(502, data.get("message") or "Paystack verification failed")
+        raise HTTPException(502, "We could not verify that payment. Please try again or pay in store.")
     tx = data.get("data") or {}
     if tx.get("status") != "success":
         return {"ok": False, "payment_status": tx.get("status") or "pending",
@@ -197,7 +197,7 @@ def paystack_verify(reference: str = Query(..., min_length=6), db: Session = Dep
 async def paystack_webhook(request: Request, db: Session = Depends(get_db)):
     key = _paystack_key()
     if not key:
-        raise HTTPException(503, "Paystack is not configured")
+        raise HTTPException(503, "Card payments are not available right now. Choose pay in store.")
     raw = await request.body()
     sig = request.headers.get("x-paystack-signature")
     if not sec.verify_paystack_signature(raw, sig):
@@ -222,7 +222,7 @@ async def paystack_webhook(request: Request, db: Session = Depends(get_db)):
         pay = db.query(Payment).filter(Payment.paystack_reference == reference).first()
         o = db.query(Order).get(pay.order_id) if pay else None
     if not o:
-        raise HTTPException(404, "Order for payment not found")
+        raise HTTPException(404, "We could not find the order for that payment.")
 
     changed = _apply_success(db, o, reference, amount, data.get("metadata") or {})
     return {"ok": True, "duplicate": not changed}
@@ -232,7 +232,7 @@ async def paystack_webhook(request: Request, db: Session = Depends(get_db)):
 def refund(pid: str, body: dict, db: Session = Depends(get_db), p: dict = Depends(require_role("manager"))):
     orig = db.query(Payment).get(pid)
     if not orig:
-        raise HTTPException(404, "Payment not found")
+        raise HTTPException(404, "We could not find that payment.")
     r = Payment(order_id=orig.order_id, method=orig.method, amount=int(body.get("amount", orig.amount)),
                 kind="refund", status="confirmed", recorded_by=p.get("sub", ""))
     db.add(r)
