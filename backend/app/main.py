@@ -47,9 +47,10 @@ from app.modules.orders.router import orders as orders_r, queue as queue_r, wash
 from app.modules.payments.router import router as payments_r
 from app.modules.reports.router import router as reports_r, days as days_r
 from app.modules.audit.router import router as admin_r
+from app.modules.admin.router import router as super_admin_r
 from app.modules.devices.router import router as devices_r
 from app.realtime.gateway import router as ws_r
 
-for r in (auth_r, customers_r, catalogue_r, store_r, queue_r, orders_r, washes_r, machines_r, dropoff_r, payments_r, reports_r, days_r, admin_r, devices_r):
+for r in (auth_r, customers_r, catalogue_r, store_r, queue_r, orders_r, washes_r, machines_r, dropoff_r, payments_r, reports_r, days_r, admin_r, super_admin_r, devices_r):
     app.include_router(r, prefix="/api/v1")
 app.include_router(ws_r)  # WS /ws (unversioned, as documented)

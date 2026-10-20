@@ -9,8 +9,15 @@ ROLE_CUSTOMER = "customer"
 ROLE_STAFF = "staff"
 ROLE_MANAGER = "manager"
 ROLE_OWNER = "owner"
+ROLE_SUPER_ADMIN = "super_admin"
 ROLE_TV = "tv"
-ROLE_RANK = {ROLE_CUSTOMER: 0, ROLE_STAFF: 1, ROLE_MANAGER: 2, ROLE_OWNER: 3}
+ROLE_RANK = {
+    ROLE_CUSTOMER: 0,
+    ROLE_STAFF: 1,
+    ROLE_MANAGER: 2,
+    ROLE_OWNER: 3,
+    ROLE_SUPER_ADMIN: 4,
+}
 
 # --- orders / wash units / machines ---
 ORDER_STATUSES = ("pending_payment", "booked", "checked_in", "in_progress", "ready", "collected", "cancelled", "expired")

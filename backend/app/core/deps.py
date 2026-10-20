@@ -35,12 +35,15 @@ def get_current_principal(
     try:
         data = decode_token(creds.credentials, expect="access")
     except Exception:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid or expired token")
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Your session has ended. Please sign in again.",
+        )
     sub, role = data.get("sub", ""), data.get("role", "customer")
     # Load the principal from the DB so deactivated accounts lose access immediately.
     active = False
     name = ""
-    if role in ("staff", "manager", "owner"):
+    if role in ("staff", "manager", "owner", "super_admin"):
         u = db.query(User).filter(User.id == sub).first()
         if u and u.is_active:
             active, name = True, u.name

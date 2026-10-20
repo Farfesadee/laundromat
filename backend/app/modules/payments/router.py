@@ -88,7 +88,7 @@ def record_payment(oid: str, body: dict, db: Session = Depends(get_db), p: dict 
         raise HTTPException(404, "Order not found")
     amount = int(body.get("amount", 0))
     if amount <= 0:
-        raise HTTPException(400, "amount must be > 0 (kobo)")
+        raise HTTPException(400, "Enter an amount greater than zero.")
     pay = Payment(store_id=o.store_id, order_id=oid, method=body.get("method", "cash"), amount=amount, kind="payment",
                   status="confirmed", paystack_reference=body.get("paystack_reference"),
                   recorded_by=p.get("sub", ""))
@@ -113,7 +113,7 @@ def paystack_init(body: dict, db: Session = Depends(get_db), p: dict = Depends(g
     if o.payment_status == "paid":
         raise HTTPException(409, "This order is already paid")
     if int(o.total) <= 0:
-        raise HTTPException(400, "Order total must be greater than zero")
+        raise HTTPException(400, "This order has no total to charge. Please add an item first.")
 
     customer = db.query(Customer).get(o.customer_id)
     email = (body.get("email") or (customer.email if customer else "") or "").strip().lower()

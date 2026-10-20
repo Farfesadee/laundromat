@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { PageHeader } from '../../components/ui';
+import { BackLink } from '../../components/back-link';
 import { ArrowRightIcon, BasketIcon, CoffeeIcon, ShirtIcon } from '../../components/icons';
 
 const CARDS = [
@@ -11,6 +12,7 @@ const CARDS = [
 export default function Book() {
   return (
     <div className="max-w-3xl mx-auto">
+      <BackLink href="/" label="Back to home" />
       <PageHeader kicker="Booking" title="What would you like?" sub="Today only. The queue opens at 8:00 AM and closes at 7:30 PM." />
       <div className="grid md:grid-cols-3 gap-3">
         {CARDS.map(({ h, t, d, Icon }) => (

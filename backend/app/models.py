@@ -62,7 +62,7 @@ class User(Base):
     email = Column(String, unique=True, index=True)
     name = Column(String, default="")
     password_hash = Column(String, default="")
-    role = Column(String, default="staff")  # staff|manager|owner
+    role = Column(String, default="staff")  # staff|manager|owner|super_admin
     pin_hash = Column(String, default="")
     is_active = Column(Boolean, default=True)
     created_at = Column(DateTime, default=now)

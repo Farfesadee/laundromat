@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react';
 import { ApiError, api, fmtTime, tokens } from '../../lib/api';
 import { Badge, Empty, ErrorBox, PageHeader, ProgressBar, Skeleton } from '../../components/ui';
+import { BackLink } from '../../components/back-link';
 
 const STAGE_PCT: Record<string, number> = { queued: 10, grace: 15, washing: 45, wash_done: 60, drying: 80, ready: 100, collected: 100 };
 
@@ -16,7 +17,7 @@ export default function Orders() {
     const t = tokens.get();
     if (!t) { setLoading(false); setError('Sign in to see your live washes.'); return; }
     try { setOrders(await api.get<any[]>('/me/orders', t)); setError(''); }
-    catch (e) { setError(e instanceof ApiError ? e.message : 'Could not load orders'); }
+    catch (e) { setError(e instanceof ApiError ? e.message : 'We could not load your washes. Please try again.'); }
     setLoading(false);
   }
 
@@ -43,6 +44,7 @@ export default function Orders() {
 
   return (
     <div className="max-w-2xl mx-auto">
+      <BackLink href="/" label="Back to home" />
       <PageHeader kicker="Live tracking" title="My washes" sub="Queue position, washer, dryer and ready time, updated live."
         right={<span className="badge bg-slate-900 text-white"><span className={`dot ${live ? 'bg-emerald-400 live-dot' : 'bg-slate-400'}`} />{live ? 'LIVE' : 'POLLING'}</span>} />
       <div className="flex gap-2 mb-4">

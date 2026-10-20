@@ -4,26 +4,26 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        ink: '#14201f',
-        paper: '#f6f4ef',
-        line: '#e4e0d7',
-        muted: '#66706d',
+        ink: '#102d36',
+        paper: '#f3f9fa',
+        line: '#dbe8ea',
+        muted: '#5e7278',
         accent: {
-          DEFAULT: '#0f5c63',
-          dark: '#0b464b',
-          soft: '#e8f1f0',
+          DEFAULT: '#07809d',
+          dark: '#05657c',
+          soft: '#e2f4f7',
         },
-        brass: '#a9844f',
+        brass: '#d99a36',
         brand: {
-          navy: '#14201f',
-          deep: '#0b464b',
-          accent: '#0f5c63',
-          mint: '#e8f1f0',
+          navy: '#102d36',
+          deep: '#0b3c49',
+          accent: '#07809d',
+          mint: '#e2f4f7',
         },
       },
       fontFamily: {
-        sans: ['ui-sans-serif', 'system-ui', '-apple-system', 'Segoe UI', 'Roboto', 'Inter', 'Arial', 'sans-serif'],
-        display: ['Georgia', 'Cambria', 'Times New Roman', 'serif'],
+        sans: ['var(--font-body)', 'Segoe UI', 'Roboto', 'Arial', 'sans-serif'],
+        display: ['var(--font-display)', 'Segoe UI', 'Roboto', 'Arial', 'sans-serif'],
       },
       maxWidth: {
         '8xl': '88rem',

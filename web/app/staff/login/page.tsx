@@ -21,9 +21,10 @@ export default function StaffLogin() {
       const result = await api.post<any>('/auth/staff/login', { email, password });
       tokens.save(result.access_token, result.refresh_token);
       await refresh();
-      window.location.href = result.role === 'owner' ? '/owner' : '/staff';
+      window.location.href =
+        result.role === 'owner' || result.role === 'super_admin' ? '/admin' : '/staff';
     } catch (e) {
-      setError(e instanceof ApiError ? e.message : 'Sign-in failed');
+      setError(e instanceof ApiError ? e.message : 'We could not sign you in. Please try again.');
     }
     setBusy(false);
   }
@@ -39,7 +40,7 @@ export default function StaffLogin() {
         </Link>
       </div>
 
-      <div className="rounded-xl border border-line bg-white p-6 sm:p-8">
+      <div className="rounded-2xl border border-line bg-white p-6 sm:p-8">
         <p className="eyebrow">Staff access</p>
         <h1 className="display mt-3 text-3xl text-ink">Team sign in.</h1>
         <p className="mt-3 text-sm leading-6 text-muted">
@@ -77,7 +78,7 @@ export default function StaffLogin() {
           </div>
 
           {error && (
-            <p role="alert" className="rounded-lg border border-[#e7c9c4] bg-[#fbefed] px-3 py-2 text-sm text-[#8d3f36]">
+            <p role="alert" className="rounded-xl border border-[#e7c9c4] bg-[#fbefed] px-3 py-2 text-sm text-[#8d3f36]">
               {error}
             </p>
           )}

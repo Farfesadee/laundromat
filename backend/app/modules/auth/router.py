@@ -31,6 +31,7 @@ from app.core.constants import (
     LOGIN_LOCKOUT_MINUTES, LOGIN_MAX_FAILURES, OTP_COOLDOWN_SECONDS,
     OTP_MAX_ATTEMPTS, OTP_MAX_PER_HOUR, OTP_TTL_MINUTES,
     PIN_LOCKOUT_MINUTES, PIN_MAX_FAILURES, ROLE_MANAGER, ROLE_OWNER, ROLE_STAFF,
+    ROLE_SUPER_ADMIN,
 )
 from app.core.database import get_db
 from app.core.deps import _client_ip, audit, get_current_principal, get_store_id, login_locked, record_login, require_role
@@ -142,7 +143,7 @@ def otp_verify(body: OTPVerify, request: Request, db: Session = Depends(get_db))
         .order_by(OtpChallenge.created_at.desc()).first()
     )
     if not ch:
-        raise HTTPException(401, "Code expired or not requested")
+        raise HTTPException(401, "That code has expired. Please request a new one.")
     exp = ch.expires_at if ch.expires_at.tzinfo else ch.expires_at.replace(tzinfo=timezone.utc)
     if now > exp:
         raise HTTPException(401, "Code expired. Request a new one.")
@@ -152,7 +153,7 @@ def otp_verify(body: OTPVerify, request: Request, db: Session = Depends(get_db))
     if not sec.verify_otp(body.code.strip(), ch.code_hash):
         db.commit()
         record_login(db, phone, False, _client_ip(request))
-        raise HTTPException(401, "Invalid code")
+        raise HTTPException(401, "That code is not correct. Please check it and try again.")
     ch.consumed = True
     c = db.query(Customer).filter(Customer.phone == phone).first()
     if not c:
@@ -210,7 +211,7 @@ def customer_login(body: LoginIn, request: Request, db: Session = Depends(get_db
 @router.get("/google/start")
 def google_start():
     if not settings.google_oauth_configured:
-        raise HTTPException(503, "Google sign in is not configured")
+        raise HTTPException(503, "Google sign in is not available right now. Please use your email and password.")
     params = {
         "client_id": settings.GOOGLE_CLIENT_ID,
         "redirect_uri": settings.google_redirect_uri,
@@ -316,7 +317,7 @@ def google_callback(
 def google_exchange(body: GoogleExchangeIn, request: Request, db: Session = Depends(get_db)):
     raw_code = body.code.strip()
     if not raw_code:
-        raise HTTPException(400, "code is required")
+        raise HTTPException(400, "That sign in link is missing its code. Please start again.")
     now = datetime.now(timezone.utc)
     rec = (
         db.query(LoginCode)
@@ -364,17 +365,17 @@ def staff_login(body: StaffLoginIn, request: Request, db: Session = Depends(get_
 def refresh(body: dict, db: Session = Depends(get_db)):
     token = (body.get("refresh_token") or "").strip()
     if not token:
-        raise HTTPException(401, "Missing refresh token")
+        raise HTTPException(401, "Your session has ended. Please sign in again.")
     try:
         data = sec.decode_token(token, expect="refresh")
     except Exception:
-        raise HTTPException(401, "Invalid or expired refresh token")
+        raise HTTPException(401, "Your session has ended. Please sign in again.")
     rec = db.query(RefreshToken).filter(RefreshToken.jti == data.get("jti", "")).first()
     if not rec or rec.revoked:
-        raise HTTPException(401, "Refresh token revoked. Please log in again.")
+        raise HTTPException(401, "Your session has ended. Please sign in again.")
     exp = rec.expires_at if rec.expires_at.tzinfo else rec.expires_at.replace(tzinfo=timezone.utc)
     if datetime.now(timezone.utc) > exp:
-        raise HTTPException(401, "Refresh token expired")
+        raise HTTPException(401, "Your session has ended. Please sign in again.")
     # rotate: revoke old, issue new pair
     rec.revoked = True
     access = sec.create_access_token(rec.subject_id, rec.role)
@@ -405,12 +406,12 @@ def logout(body: dict, db: Session = Depends(get_db)):
 def pin_verify(body: dict, principal: dict = Depends(require_role(ROLE_STAFF)), db: Session = Depends(get_db)):
     pin = (body.get("pin") or "").strip()
     if not pin:
-        raise HTTPException(400, "pin is required")
+        raise HTTPException(400, "Enter your manager PIN to continue.")
     key = f"pin:{principal['sub']}"
     if login_locked(db, key, PIN_MAX_FAILURES, PIN_LOCKOUT_MINUTES):
         raise HTTPException(429, "PIN temporarily locked. Try again later.")
     authoriser = None
-    for u in db.query(User).filter(User.role.in_((ROLE_MANAGER, ROLE_OWNER)), User.is_active == True).all():  # noqa: E712
+    for u in db.query(User).filter(User.role.in_((ROLE_MANAGER, ROLE_OWNER, ROLE_SUPER_ADMIN)), User.is_active == True).all():  # noqa: E712
         if u.pin_hash and sec.verify_pin(pin, u.pin_hash):
             authoriser = u
             break
@@ -420,5 +421,5 @@ def pin_verify(body: dict, principal: dict = Depends(require_role(ROLE_STAFF)), 
           None, {"authorised": bool(authoriser)}, ip=principal.get("ip", ""), store_id=get_store_id())
     db.commit()
     if not authoriser:
-        raise HTTPException(403, "Invalid manager PIN")
+        raise HTTPException(403, "That PIN is not correct. Please try again.")
     return {"authorised": True, "by": authoriser.email, "role": authoriser.role}

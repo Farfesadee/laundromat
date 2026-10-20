@@ -15,6 +15,47 @@ export class ApiError extends Error {
   }
 }
 
+const GENERIC_DETAILS = new Set([
+  'not found',
+  'bad request',
+  'forbidden',
+  'unauthorized',
+  'internal server error',
+  'method not allowed',
+  'unprocessable entity',
+]);
+
+const STATUS_MESSAGES: Record<number, string> = {
+  400: 'Some details need attention. Please review them and try again.',
+  401: 'Your session has ended. Please sign in again.',
+  403: 'You do not have access to that. Sign in with the right account.',
+  404: 'We could not find that page or record. It may have been removed.',
+  405: 'That action is not available here. Please refresh and try again.',
+  408: 'The request took too long. Please try again.',
+  409: 'That change conflicts with an existing record. Please refresh and try again.',
+  422: 'Some details need attention. Please review the form and try again.',
+  429: 'Too many attempts. Please wait a moment and try again.',
+  500: 'Something went wrong on our side. Please try again in a moment.',
+  502: 'The laundry service is temporarily unavailable. Please try again in a moment.',
+  503: 'The laundry service is temporarily unavailable. Please try again in a moment.',
+  504: 'The laundry service is taking too long to respond. Please try again.',
+};
+
+function friendlyError(status: number, detail: unknown): string {
+  const raw = typeof detail === 'string' ? detail : '';
+  const text = raw.trim();
+  const lower = text.toLowerCase();
+  const looksTechnical =
+    !text ||
+    text.length > 220 ||
+    GENERIC_DETAILS.has(lower) ||
+    lower.startsWith('traceback') ||
+    lower.includes('sqlalchemy') ||
+    lower.includes('internal server error');
+  if (!looksTechnical) return text;
+  return STATUS_MESSAGES[status] || 'That request did not go through. Please try again.';
+}
+
 export const kobo = (n: number | null | undefined) =>
   n == null ? '-' : '₦' + (n / 100).toLocaleString('en-NG');
 
@@ -35,9 +76,14 @@ async function req<T>(path: string, init?: RequestInit, token?: string | null): 
     throw new ApiError(0, 'Cannot reach the server. Check your connection and try again.');
   }
   if (!r.ok) {
-    let detail = '';
-    try { detail = (await r.json()).detail || ''; } catch { try { detail = await r.text(); } catch {} }
-    throw new ApiError(r.status, detail || `Request failed (${r.status})`);
+    let detail: unknown = '';
+    try {
+      const body = await r.json();
+      detail = body?.detail ?? body?.message ?? '';
+    } catch {
+      try { detail = await r.text(); } catch {}
+    }
+    throw new ApiError(r.status, friendlyError(r.status, detail));
   }
   if (r.status === 204) return undefined as unknown as T;
   return r.json() as Promise<T>;

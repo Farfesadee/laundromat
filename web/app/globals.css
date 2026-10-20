@@ -3,15 +3,15 @@
 @tailwind utilities;
 
 :root {
-  --ink: #14201f;
-  --paper: #f6f4ef;
+  --ink: #102d36;
+  --paper: #f3f9fa;
   --surface: #ffffff;
-  --line: #e4e0d7;
-  --muted: #66706d;
-  --accent: #0f5c63;
-  --accent-dark: #0b464b;
-  --accent-soft: #e8f1f0;
-  --brass: #a9844f;
+  --line: #dbe8ea;
+  --muted: #5e7278;
+  --accent: #07809d;
+  --accent-dark: #05657c;
+  --accent-soft: #e2f4f7;
+  --brass: #d99a36;
 }
 
 @layer base {
@@ -22,7 +22,7 @@
   body {
     @apply text-ink antialiased;
     background: var(--paper);
-    font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Inter, Arial, sans-serif;
+    font-family: var(--font-body), "Segoe UI", Roboto, Arial, sans-serif;
   }
 
   section[id] {
@@ -42,9 +42,10 @@
 
 @layer components {
   .display {
-    font-family: Georgia, Cambria, "Times New Roman", serif;
-    font-weight: 400;
-    letter-spacing: -0.025em;
+    font-family: var(--font-display), "Segoe UI", Roboto, Arial, sans-serif;
+    font-weight: 600;
+    letter-spacing: -0.035em;
+    font-optical-sizing: auto;
   }
 
   .eyebrow {
@@ -61,28 +62,28 @@
   }
 
   .card {
-    @apply rounded-xl border border-line bg-white p-5;
-    box-shadow: 0 1px 2px rgba(20, 32, 31, 0.04);
+    @apply min-w-0 rounded-2xl border border-line bg-white p-5;
+    box-shadow: 0 1px 2px rgba(16, 45, 54, 0.04);
   }
 
   .card-hover {
-    @apply transition hover:border-[#c9d6d4] hover:shadow-[0_16px_36px_-24px_rgba(20,32,31,0.35)];
+    @apply transition hover:border-[#b9d9de] hover:shadow-[0_18px_40px_-26px_rgba(16,45,54,0.35)];
   }
 
   .btn {
-    @apply inline-flex items-center justify-center gap-2 rounded-lg bg-ink px-5 py-3 text-sm font-semibold text-white transition hover:bg-accent-soft hover:text-ink active:bg-[#d9e8e6] active:text-ink active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-50;
+    @apply inline-flex items-center justify-center gap-2 rounded-full bg-ink px-5 py-3 text-sm font-semibold text-white transition hover:bg-accent-soft hover:text-ink active:bg-[#d3edf1] active:text-ink active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-50;
   }
 
   .btn-aqua {
-    @apply bg-accent hover:bg-[#14707a] hover:text-white active:bg-accent-dark active:text-white;
+    @apply bg-accent text-white hover:bg-[#0d92af] hover:text-white active:bg-accent-dark active:text-white;
   }
 
   .btn-amber {
-    @apply bg-brass text-white hover:bg-[#967441] hover:text-white active:bg-[#85663a] active:text-white;
+    @apply bg-brass text-ink hover:bg-[#e7ad4f] hover:text-ink active:bg-[#c98b2b] active:text-ink;
   }
 
   .btn-ghost {
-    @apply border border-line bg-white text-ink hover:border-accent hover:text-accent;
+    @apply border border-line bg-white text-ink hover:border-accent hover:bg-accent-soft hover:text-ink;
   }
 
   .btn-light {
@@ -98,12 +99,12 @@
   }
 
   .input {
-    @apply w-full rounded-lg border border-line bg-white px-3.5 py-3 text-sm outline-none transition placeholder:text-[#9aa39f] focus:border-accent focus:ring-2 focus:ring-accent/15;
+    @apply w-full rounded-xl border border-line bg-white px-3.5 py-3 text-sm outline-none transition placeholder:text-[#95a7aa] focus:border-accent focus:ring-2 focus:ring-accent/15;
   }
 
   /* Country selector with bundled SVG flags, styled to match .input. */
   .phone-field {
-    @apply flex items-center gap-2 rounded-lg border border-line bg-white px-3.5 py-2.5 text-sm transition;
+    @apply flex items-center gap-2 rounded-xl border border-line bg-white px-3.5 py-2.5 text-sm transition;
   }
 
   .phone-field:focus-within {
@@ -172,7 +173,7 @@
 
   .phone-field .PhoneInputInput,
   .phone-field .phone-field-input {
-    @apply min-w-0 flex-1 border-0 bg-transparent p-0 text-sm text-ink outline-none placeholder:text-[#9aa39f];
+    @apply min-w-0 flex-1 border-0 bg-transparent p-0 text-sm text-ink outline-none placeholder:text-[#95a7aa];
   }
 
   .label {
@@ -219,7 +220,7 @@
 }
 
 .skeleton {
-  @apply animate-pulse rounded-lg bg-[#e9e5dc];
+  @apply animate-pulse rounded-2xl bg-[#e2eef0];
 }
 
 @keyframes rise {

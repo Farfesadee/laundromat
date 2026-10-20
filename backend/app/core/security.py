@@ -96,10 +96,10 @@ def normalize_phone(raw: str) -> str:
         return phonenumbers.format_number(num, phonenumbers.PhoneNumberFormat.E164)
     except ImportError:
         if not re.fullmatch(r"\+\d{7,15}", s):
-            raise HTTPException(400, "Phone must be E.164 (e.g. +2348012345678)")
+            raise HTTPException(400, "Enter a valid phone number with a country code.")
         return s
     except Exception:
-        raise HTTPException(400, "Phone must be E.164 (e.g. +2348012345678)")
+        raise HTTPException(400, "Enter a valid phone number with a country code.")
 
 # ---------- JWT ----------
 

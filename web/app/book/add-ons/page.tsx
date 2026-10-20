@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { ApiError, api, kobo } from '../../../lib/api';
 import { ErrorBox, PageHeader, Skeleton, Steps } from '../../../components/ui';
+import { BackLink } from '../../../components/back-link';
 import { ArrowRightIcon } from '../../../components/icons';
 
 export const dynamic = 'force-dynamic';
@@ -29,6 +30,7 @@ function Inner() {
 
   return (
     <div className="max-w-md mx-auto">
+      <BackLink href="/book" label="Back to services" />
       <PageHeader kicker="Extras" title="Anything to enjoy?" sub={`${washes} wash${washes > 1 ? 'es' : ''} in your basket.`} />
       <Steps steps={['Washes', 'Extras', 'Pay', 'Track']} current={1} />
       {loading ? <><Skeleton /><Skeleton className="mt-2" /></> :

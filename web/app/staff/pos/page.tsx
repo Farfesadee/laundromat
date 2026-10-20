@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react';
 import { ApiError, api, kobo, tokens } from '../../../lib/api';
 import { ErrorBox, PageHeader } from '../../../components/ui';
+import { BackLink } from '../../../components/back-link';
 import { PhoneField } from '../../../components/phone-field';
 
 export default function POS() {
@@ -32,11 +33,12 @@ export default function POS() {
       await api.post(`/orders/${order.id}/payments`, { method, amount }, tokens.get());
       setMsg(`Sale complete: order #${order.order_no}, ${kobo(amount)} via ${method}.`);
       setCart({});
-    } catch (e) { setError(e instanceof ApiError ? e.message : 'Sale failed'); }
+    } catch (e) { setError(e instanceof ApiError ? e.message : 'We could not complete the sale. Please try again.'); }
   }
 
   return (
     <div>
+      <BackLink href="/staff" label="Back to overview" />
       <PageHeader kicker="Point of sale" title="New sale" sub="Retail, drinks and washes. Partial payments supported." />
       {error && <div className="mb-3"><ErrorBox message={error} /></div>}
       <div className="grid md:grid-cols-[1.4fr_1fr] gap-3">

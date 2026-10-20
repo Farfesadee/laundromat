@@ -17,8 +17,8 @@ export function Nav() {
   const [open, setOpen] = useState(false);
 
   const dashboard =
-    user?.role === 'owner'
-      ? '/owner'
+    user?.role === 'owner' || user?.role === 'super_admin'
+      ? '/admin'
       : user?.role === 'staff' || user?.role === 'manager'
         ? '/staff'
         : null;
@@ -77,7 +77,7 @@ export function Nav() {
         <button
           type="button"
           onClick={() => setOpen((value) => !value)}
-          className="grid h-10 w-10 place-items-center rounded-lg border border-line bg-white text-ink lg:hidden"
+          className="grid h-10 w-10 place-items-center rounded-xl border border-line bg-white text-ink lg:hidden"
           aria-label={open ? 'Close menu' : 'Open menu'}
           aria-expanded={open}
         >

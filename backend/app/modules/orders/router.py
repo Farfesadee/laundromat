@@ -8,7 +8,7 @@ from sqlalchemy import func
 from app.core.database import get_db
 from app.core.deps import require_role, get_current_principal, audit
 from app.core import security as sec
-from app.models import Customer, Order, OrderItem, Service, WashUnit, Machine, MachineEvent, ReworkEvent, OperatingDay, Payment
+from app.models import Customer, Order, OrderItem, Service, WashUnit, Machine, MachineEvent, ReworkEvent, OperatingDay, Payment, User
 from app.queue.service import recompute, estimate_for_new_booking
 
 orders = APIRouter(prefix="/orders", tags=["orders"])
@@ -99,7 +99,7 @@ def create_order(body: dict, db: Session = Depends(get_db), p: dict = Depends(ge
     from app.core.config import settings as _s
     washes_n = int(body.get("washes", 1))
     if washes_n < 1 or washes_n > 20:
-        raise HTTPException(400, "washes must be 1..20")
+        raise HTTPException(400, "Choose between 1 and 20 washes.")
     otype = body.get("type", "self_service")
     channel = body.get("channel", "in_store")
     raw_phone = (body.get("phone") or "").strip()
@@ -303,7 +303,7 @@ def restart(wid: str, body: dict, db: Session = Depends(get_db), p: dict = Depen
     # manager PIN step-up
     pin = body.get("pin", "")
     ok = False; by = ""
-    for usr in db.query(User).filter(User.role.in_(("manager", "owner"))).all():
+    for usr in db.query(User).filter(User.role.in_(("manager", "owner", "super_admin"))).all():
         if usr.pin_hash and sec.verify_pin(pin, usr.pin_hash):
             ok = True; by = usr.email; break
     if not ok:

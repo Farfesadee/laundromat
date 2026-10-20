@@ -97,14 +97,14 @@ export default function Register() {
       await refresh();
       window.location.href = '/book';
     } catch (e) {
-      setError(e instanceof ApiError ? e.message : 'Something went wrong');
+      setError(e instanceof ApiError ? e.message : 'We could not create your account. Please try again.');
     }
     setBusy(false);
   }
 
   function googleSignup() {
     if (!API_BASE) {
-      setError('Google sign up is not available in this environment.');
+      setError('Google sign up is not available right now. Please create an account with your email.');
       return;
     }
     window.location.href = `${API_BASE}/auth/google/start`;
@@ -311,7 +311,7 @@ export default function Register() {
         </div>
 
         {error && (
-          <p role="alert" className="rounded-lg border border-[#e7c9c4] bg-[#fbefed] px-3 py-2 text-sm text-[#8d3f36]">
+          <p role="alert" className="rounded-xl border border-[#e7c9c4] bg-[#fbefed] px-3 py-2 text-sm text-[#8d3f36]">
             {error}
           </p>
         )}

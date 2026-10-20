@@ -2,11 +2,13 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { PageHeader, Steps } from '../../../components/ui';
+import { BackLink } from '../../../components/back-link';
 
 export default function DropOff() {
   const [n, setN] = useState(3);
   return (
     <div className="max-w-md mx-auto">
+      <BackLink href="/book" label="Back to services" />
       <PageHeader kicker="Drop-off" title="How many loads?" sub="We wash, dry and fold. You get a ready time and a pickup alert." />
       <Steps steps={['Loads', 'Details', 'Pay', 'Pickup']} current={0} />
       <div className="card text-center">

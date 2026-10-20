@@ -84,11 +84,11 @@ const STEPS = [
 export default function Home() {
   return (
     <div>
-      <section className="grid items-center gap-10 pb-14 pt-4 sm:pb-20 sm:pt-8 lg:grid-cols-[1.02fr_0.98fr] lg:gap-16">
-        <div>
-          <p className="eyebrow">Self-service laundry</p>
-          <h1 className="display mt-4 text-[2.75rem] leading-[1.05] text-ink sm:text-5xl">
-            Laundry day,
+      <section className="grid min-w-0 items-center gap-10 pb-14 pt-4 sm:pb-20 sm:pt-8 lg:grid-cols-[1.02fr_0.98fr] lg:gap-16">
+        <div className="min-w-0">
+          <p className="eyebrow">Laundry, simplified</p>
+          <h1 className="display mt-4 text-[2.75rem] leading-[1.03] text-ink sm:text-5xl lg:text-[3.5rem]">
+            Fresh laundry,
             <br />
             without the lost hours.
           </h1>
@@ -120,32 +120,41 @@ export default function Home() {
           </ul>
         </div>
 
-        <figure className="overflow-hidden rounded-xl border border-line bg-white">
-          <img
-            src="/images/laundry-flyer.jpg"
-            alt="A washing machine with stacks of freshly folded laundry and an iron"
-            width={635}
-            height={739}
-            loading="eager"
-            className="h-auto w-full"
-          />
-          <figcaption className="flex items-center justify-between gap-4 border-t border-line px-5 py-4">
-            <div>
-              <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#8a938f]">
-                The everyday standard
-              </p>
-              <p className="display mt-1 text-lg text-ink">Wash, dry, fold. All under one roof.</p>
-            </div>
-            <WasherIcon className="h-6 w-6 shrink-0 text-accent" />
-          </figcaption>
-        </figure>
+        <div className="relative min-w-0">
+          <div aria-hidden className="pointer-events-none absolute -right-5 -top-6 hidden sm:block">
+            <span className="absolute right-20 top-2 h-14 w-14 rounded-full border border-accent/25" />
+            <span className="absolute right-2 top-16 h-28 w-28 rounded-full border border-accent/15" />
+            <span className="absolute right-24 top-24 h-7 w-7 rounded-full bg-accent/10" />
+          </div>
+          <figure className="relative overflow-hidden rounded-[1.75rem] border border-line bg-white shadow-[0_24px_60px_-40px_rgba(16,45,54,0.5)]">
+            <img
+              src="/images/laundry-flyer.jpg"
+              alt="A washing machine with stacks of freshly folded laundry and an iron"
+              width={635}
+              height={739}
+              loading="eager"
+              className="h-auto w-full max-w-full"
+            />
+            <figcaption className="flex items-center justify-between gap-4 border-t border-line px-5 py-4">
+              <div>
+                <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-muted">
+                  The everyday standard
+                </p>
+                <p className="display mt-1 text-lg text-ink">Wash, dry, fold. All under one roof.</p>
+              </div>
+              <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-accent-soft text-accent">
+                <WasherIcon className="h-5 w-5" />
+              </span>
+            </figcaption>
+          </figure>
+        </div>
       </section>
 
       <section className="section-rule py-8">
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
           {PROMISES.map(({ icon: Icon, title, text }) => (
             <div key={title} className="flex gap-3">
-              <span className="grid h-10 w-10 shrink-0 place-items-center rounded-lg bg-accent-soft text-accent">
+              <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-accent-soft text-accent">
                 <Icon className="h-5 w-5" />
               </span>
               <div>
@@ -170,19 +179,26 @@ export default function Home() {
         </div>
 
         <div className="mt-10 grid gap-4 md:grid-cols-3">
-          {SERVICES.map(({ href, title, text, cta, icon: Icon }) => (
-            <Link key={title} href={href} className="card card-hover group flex flex-col">
-              <span className="grid h-11 w-11 place-items-center rounded-lg bg-accent-soft text-accent">
-                <Icon className="h-5 w-5" />
-              </span>
-              <h3 className="mt-5 text-lg font-semibold text-ink">{title}</h3>
-              <p className="mt-2 flex-1 text-sm leading-6 text-muted">{text}</p>
-              <span className="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-accent">
-                {cta}
-                <ArrowRightIcon className="h-4 w-4 transition group-hover:translate-x-0.5" />
-              </span>
-            </Link>
-          ))}
+          {SERVICES.map(({ href, title, text, cta, icon: Icon }, index) => {
+            const tone = [
+              'bg-accent-soft text-accent',
+              'bg-[#fdf1dc] text-[#93641f]',
+              'bg-[#e6f6ed] text-[#2f7048]',
+            ][index];
+            return (
+              <Link key={title} href={href} className="card card-hover group flex flex-col">
+                <span className={`grid h-12 w-12 place-items-center rounded-full ${tone}`}>
+                  <Icon className="h-5 w-5" />
+                </span>
+                <h3 className="mt-5 text-lg font-semibold text-ink">{title}</h3>
+                <p className="mt-2 flex-1 text-sm leading-6 text-muted">{text}</p>
+                <span className="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-accent">
+                  {cta}
+                  <ArrowRightIcon className="h-4 w-4 transition group-hover:translate-x-0.5" />
+                </span>
+              </Link>
+            );
+          })}
         </div>
       </section>
 
@@ -237,7 +253,7 @@ export default function Home() {
       </section>
 
       <section className="py-4 sm:py-8">
-        <div className="relative overflow-hidden rounded-xl border border-[#0b2e33]">
+        <div className="relative overflow-hidden rounded-[1.75rem] border border-[#0b3c49]">
           <img
             src="/images/laundry-water.jpg"
             alt="Fresh folded towels and a splash of water beside a washing machine"
@@ -246,7 +262,7 @@ export default function Home() {
             loading="lazy"
             className="absolute inset-0 h-full w-full object-cover"
           />
-          <div className="absolute inset-0 bg-[#0b2e33]/75" />
+          <div className="absolute inset-0 bg-[#0b3c49]/70" />
           <div className="relative flex min-h-[340px] items-center px-6 py-12 sm:min-h-[400px] sm:px-12 sm:py-16">
             <div className="max-w-xl">
               <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-white/60">

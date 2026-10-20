@@ -39,7 +39,7 @@ async def ws(ws: WebSocket):
     try:
         data = decode_token(token, expect="access")
         role = data.get("role", "customer")
-        if role in ("staff", "manager", "owner"):
+        if role in ("staff", "manager", "owner", "super_admin"):
             channel = f"store:{store_id}:staff"
         else:
             channel = f"customer:{data.get('sub')}"

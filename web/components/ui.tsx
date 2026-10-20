@@ -6,8 +6,8 @@ export function Logo({ light = false }: { light?: boolean }) {
   return (
     <span className="flex items-center gap-2.5">
       <span
-        className={`grid h-9 w-9 place-items-center rounded-md ${
-          light ? 'bg-white text-ink' : 'bg-ink text-white'
+        className={`grid h-9 w-9 place-items-center rounded-xl ${
+          light ? 'bg-white text-accent' : 'bg-accent text-white'
         }`}
       >
         <svg width="19" height="19" viewBox="0 0 24 24" fill="none" aria-hidden="true">
@@ -81,21 +81,29 @@ export function Stat({
 
 const badgeTones: Record<string, string> = {
   washing: 'bg-accent-soft text-accent',
-  drying: 'bg-[#f4ecdf] text-[#8a6534]',
-  queued: 'bg-[#eeeae2] text-[#5f6864]',
-  waiting: 'bg-[#eeeae2] text-[#5f6864]',
-  grace: 'bg-[#f7e7e5] text-[#9a4b43]',
-  ready: 'bg-[#e5f0e5] text-[#3f6b45]',
-  booked: 'bg-[#e7eef1] text-[#3f6470]',
-  collected: 'bg-[#eeeae2] text-[#7a8581]',
+  drying: 'bg-[#fdf1dc] text-[#93641f]',
+  queued: 'bg-[#eef2f3] text-[#5e7278]',
+  waiting: 'bg-[#eef2f3] text-[#5e7278]',
+  grace: 'bg-[#fbe9e6] text-[#93453b]',
+  ready: 'bg-[#e6f6ed] text-[#2f7048]',
+  booked: 'bg-[#e7f2f6] text-[#346579]',
+  checked_in: 'bg-[#e7f2f6] text-[#346579]',
+  in_progress: 'bg-accent-soft text-accent',
+  pending_payment: 'bg-[#fdf1dc] text-[#93641f]',
+  paid: 'bg-[#e6f6ed] text-[#2f7048]',
+  unpaid: 'bg-[#fbe9e6] text-[#93453b]',
+  partial: 'bg-[#fdf1dc] text-[#93641f]',
+  collected: 'bg-[#eef2f3] text-[#5e7278]',
+  cancelled: 'bg-[#f3eeee] text-[#7c5c58]',
+  expired: 'bg-[#f3eeee] text-[#7c5c58]',
   running: 'bg-accent-soft text-accent',
-  available: 'bg-[#e5f0e5] text-[#3f6b45]',
-  maintenance: 'bg-[#e9e5dc] text-[#6d7672]',
-  error: 'bg-[#f7e7e5] text-[#9a4b43]',
+  available: 'bg-[#e6f6ed] text-[#2f7048]',
+  maintenance: 'bg-[#eef2f3] text-[#5e7278]',
+  error: 'bg-[#fbe9e6] text-[#93453b]',
 };
 
 export function Badge({ status, children }: { status?: string; children?: React.ReactNode }) {
-  const tone = badgeTones[status || ''] || 'bg-[#eeeae2] text-[#5f6864]';
+  const tone = badgeTones[status || ''] || 'bg-[#eef2f3] text-[#5e7278]';
   return (
     <span className={`badge ${tone}`}>
       <span
@@ -113,7 +121,7 @@ export function Badge({ status, children }: { status?: string; children?: React.
 export function Empty({ title, sub, action }: { title: string; sub?: string; action?: React.ReactNode }) {
   return (
     <div className="card py-10 text-center">
-      <div className="mx-auto grid h-12 w-12 place-items-center rounded-lg bg-accent-soft text-accent">
+      <div className="mx-auto grid h-12 w-12 place-items-center rounded-full bg-accent-soft text-accent">
         <BasketIcon className="h-6 w-6" />
       </div>
       <p className="mt-3 font-semibold text-ink">{title}</p>
@@ -129,11 +137,18 @@ export function Skeleton({ className = '' }: { className?: string }) {
 
 export function ErrorBox({ message, retry }: { message: string; retry?: () => void }) {
   return (
-    <div className="flex items-center justify-between gap-3 rounded-lg border border-[#e7c9c4] bg-[#fbefed] p-4 text-sm text-[#8d3f36]">
+    <div
+      role="alert"
+      className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-[#e7c9c4] bg-[#fbefed] p-4 text-sm leading-6 text-[#8d3f36]"
+    >
       <span>{message}</span>
       {retry && (
-        <button className="btn !px-3 !py-2 !bg-[#8d3f36]" onClick={retry}>
-          Retry
+        <button
+          type="button"
+          className="shrink-0 rounded-full border border-[#d8b4ae] bg-white px-4 py-2 text-xs font-semibold text-[#8d3f36] transition hover:bg-[#f7e6e3]"
+          onClick={retry}
+        >
+          Try again
         </button>
       )}
     </div>
@@ -155,7 +170,7 @@ export function Steps({ steps, current }: { steps: string[]; current: number }) 
 
 export function ProgressBar({ value }: { value: number }) {
   return (
-    <div className="h-1.5 overflow-hidden rounded-full bg-[#ece8df]">
+    <div className="h-1.5 overflow-hidden rounded-full bg-[#e2eef0]">
       <div
         className="h-full rounded-full bg-accent transition-all"
         style={{ width: `${Math.min(100, Math.max(0, value))}%` }}

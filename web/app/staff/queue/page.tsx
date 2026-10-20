@@ -2,6 +2,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { ApiError, api, fmtTime, tokens } from '../../../lib/api';
 import { Badge, Empty, ErrorBox, PageHeader } from '../../../components/ui';
+import { BackLink } from '../../../components/back-link';
 
 export default function StaffQueue() {
   const [rows, setRows] = useState<any[]>([]);
@@ -16,7 +17,7 @@ export default function StaffQueue() {
     try {
       const [q, m] = await Promise.all([api.get<any[]>('/queue', t), api.get<any[]>('/machines', t)]);
       setRows(q); setMachines(m); setError('');
-    } catch (e) { setError(e instanceof ApiError ? e.message : 'Could not load queue'); }
+    } catch (e) { setError(e instanceof ApiError ? e.message : 'We could not load the queue. Please try again.'); }
   }
   useEffect(() => { load(); const id = setInterval(load, 8000); return () => clearInterval(id); }, []);
 
@@ -27,12 +28,13 @@ export default function StaffQueue() {
   async function act(path: string, body: any = {}) {
     setBusy(path);
     try { await api.post(path, body, tokens.get()); await load(); }
-    catch (e) { setError(e instanceof ApiError ? e.message : 'Action failed'); }
+    catch (e) { setError(e instanceof ApiError ? e.message : 'That action did not go through. Please try again.'); }
     setBusy('');
   }
 
   return (
     <div>
+      <BackLink href="/staff" label="Back to overview" />
       <PageHeader kicker="Queue" title="Self-service queue" sub="Start washes on free machines, skip expired grace periods. Every action is audited."
         right={<div className="flex gap-1.5">{['all', 'queued', 'grace', 'washing', 'drying', 'ready'].map(f => (
           <button key={f} onClick={() => setFilter(f)} className={`badge cursor-pointer ${filter === f ? '!bg-[#0a1633] !text-white' : 'bg-slate-200'}`}>{f}</button>))}</div>} />

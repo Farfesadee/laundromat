@@ -1,9 +1,24 @@
 import 'react-phone-number-input/style.css';
 import './globals.css';
 import type { Metadata } from 'next';
+import { Bricolage_Grotesque, DM_Sans } from 'next/font/google';
 import { AuthProvider } from '../lib/auth';
 import { Nav } from './nav';
 import { SiteFooter } from '../components/site-footer';
+
+const bodyFont = DM_Sans({
+  subsets: ['latin'],
+  weight: 'variable',
+  variable: '--font-body',
+  display: 'swap',
+});
+
+const displayFont = Bricolage_Grotesque({
+  subsets: ['latin'],
+  weight: 'variable',
+  variable: '--font-display',
+  display: 'swap',
+});
 
 export const metadata: Metadata = {
   title: 'LAUNDROMAT | Self-service laundry, without the wait',
@@ -20,7 +35,7 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <body className="flex min-h-screen flex-col">
+      <body className={`${bodyFont.variable} ${displayFont.variable} flex min-h-screen flex-col`}>
         <AuthProvider>
           <Nav />
           <main className="mx-auto w-full max-w-6xl flex-1 px-5 py-6 sm:px-6 sm:py-8">

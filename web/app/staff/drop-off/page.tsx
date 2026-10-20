@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react';
 import { ApiError, api, kobo, tokens } from '../../../lib/api';
 import { Badge, Empty, ErrorBox, PageHeader } from '../../../components/ui';
+import { BackLink } from '../../../components/back-link';
 
 export default function DropOffStaff() {
   const [rows, setRows] = useState<any[]>([]);
@@ -11,6 +12,7 @@ export default function DropOffStaff() {
   }, []);
   return (
     <div>
+      <BackLink href="/staff" label="Back to overview" />
       <PageHeader kicker="Drop-off" title="Drop-off orders" sub="Separate lane from the self-service queue." />
       {error ? <ErrorBox message={error} /> : rows.length === 0 ? <Empty title="No drop-off orders" sub="New drop-offs will land here." /> : (
         <div className="card !p-0 overflow-hidden">

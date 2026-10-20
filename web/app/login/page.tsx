@@ -65,7 +65,7 @@ export default function Login() {
       await refresh();
       window.location.href = '/book';
     } catch (e) {
-      setError(e instanceof ApiError ? e.message : 'Sign in failed');
+      setError(e instanceof ApiError ? e.message : 'We could not sign you in. Please try again.');
     }
     setBusy(false);
   }
@@ -81,7 +81,7 @@ export default function Login() {
       setCooldown(60);
       setInfo('Code sent. Enter the 6-digit code from your text message.');
     } catch (e) {
-      setError(e instanceof ApiError ? e.message : 'Something went wrong');
+      setError(e instanceof ApiError ? e.message : 'We could not send the code. Please try again.');
     }
     setBusy(false);
   }
@@ -96,7 +96,7 @@ export default function Login() {
       await refresh();
       window.location.href = '/book';
     } catch (e) {
-      setError(e instanceof ApiError ? e.message : 'Something went wrong');
+      setError(e instanceof ApiError ? e.message : 'We could not verify that code. Please try again.');
     }
     setBusy(false);
   }
@@ -111,7 +111,7 @@ export default function Login() {
 
   function googleLogin() {
     if (!API_BASE) {
-      setError('Google sign in is not available in this environment.');
+      setError('Google sign in is not available right now. Use your email and password instead.');
       return;
     }
     window.location.href = `${API_BASE}/auth/google/start`;
@@ -232,12 +232,12 @@ export default function Login() {
       )}
 
       {error && (
-        <p role="alert" className="mt-4 rounded-lg border border-[#e7c9c4] bg-[#fbefed] px-3 py-2 text-sm text-[#8d3f36]">
+        <p role="alert" className="mt-4 rounded-xl border border-[#e7c9c4] bg-[#fbefed] px-3 py-2 text-sm text-[#8d3f36]">
           {error}
         </p>
       )}
       {info && (
-        <p role="status" className="mt-4 rounded-lg border border-[#cfe0d3] bg-[#eef6ef] px-3 py-2 text-sm text-[#3f6b45]">
+        <p role="status" className="mt-4 rounded-xl border border-[#cfe0d3] bg-[#eef6ef] px-3 py-2 text-sm text-[#3f6b45]">
           {info}
         </p>
       )}

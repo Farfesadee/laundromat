@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { ApiError, api, kobo } from '../../../lib/api';
 import { ErrorBox, PageHeader, Steps } from '../../../components/ui';
+import { BackLink } from '../../../components/back-link';
 
 export default function SelfService() {
   const [n, setN] = useState(2);
@@ -20,6 +21,7 @@ export default function SelfService() {
 
   return (
     <div className="max-w-md mx-auto">
+      <BackLink href="/book" label="Back to services" />
       <PageHeader kicker="Self-service" title="How many washes?" sub="Each wash is a 10 kg standard load." />
       <Steps steps={['Washes', 'Extras', 'Pay', 'Track']} current={0} />
       <div className="card text-center">

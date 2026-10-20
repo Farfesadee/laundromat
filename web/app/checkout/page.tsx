@@ -4,6 +4,7 @@ import { useSearchParams } from 'next/navigation';
 import { ApiError, api, kobo, tokens } from '../../lib/api';
 import { useAuth } from '../../lib/auth';
 import { ErrorBox, PageHeader, Steps } from '../../components/ui';
+import { BackLink } from '../../components/back-link';
 import { ArrowRightIcon } from '../../components/icons';
 import { PhoneField, isValidPhoneNumber } from '../../components/phone-field';
 
@@ -66,12 +67,13 @@ function Inner() {
       } else {
         setDone({ ...order, payUrl: null });
       }
-    } catch (e) { setError(e instanceof ApiError ? e.message : 'Checkout failed'); }
+    } catch (e) { setError(e instanceof ApiError ? e.message : 'We could not create this order. Please try again.'); }
     setBusy(false);
   }
 
   return (
     <div className="max-w-md mx-auto">
+      <BackLink href="/book" label="Back to booking" />
       <PageHeader kicker="Checkout" title="Order summary" sub="Online bookings are confirmed after verified payment." />
       <Steps steps={['Washes', 'Extras', 'Pay', 'Track']} current={2} />
       <div className="card space-y-3">

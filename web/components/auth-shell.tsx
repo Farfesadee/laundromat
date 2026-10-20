@@ -23,10 +23,10 @@ export function AuthShell({
 }: Props) {
   return (
     <div className="py-4 sm:py-8">
-      <div className="grid min-h-[640px] overflow-hidden rounded-xl border border-line bg-white lg:grid-cols-2">
+      <div className="grid min-h-[640px] overflow-hidden rounded-[1.75rem] border border-line bg-white lg:grid-cols-2">
         <div className="relative hidden lg:block">
           <img src={image} alt={imageAlt} className="absolute inset-0 h-full w-full object-cover" />
-          <div className="absolute inset-0 bg-[#0b2e33]/80" />
+          <div className="absolute inset-0 bg-[#0b3c49]/80" />
           <div className="relative flex h-full flex-col justify-between p-10 xl:p-12">
             <Link href="/" className="inline-flex w-fit" aria-label="LAUNDROMAT home">
               <Logo light />
@@ -39,7 +39,7 @@ export function AuthShell({
               <p className="mt-4 max-w-sm text-sm leading-6 text-white/65">{panelText}</p>
             </div>
             <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-white/35">
-              Wash · Dry · Relax
+              Wash · Dry · Fold
             </p>
           </div>
         </div>

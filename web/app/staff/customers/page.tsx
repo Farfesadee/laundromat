@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import { ApiError, api, tokens } from '../../../lib/api';
 import { PageHeader } from '../../../components/ui';
+import { BackLink } from '../../../components/back-link';
 import { PhoneField } from '../../../components/phone-field';
 
 export default function StaffCustomers() {
@@ -14,7 +15,7 @@ export default function StaffCustomers() {
   async function search() {
     setError(''); setMsg('');
     try { setRows(await api.get<any[]>(`/customers?q=${encodeURIComponent(q)}`, tokens.get())); }
-    catch (e) { setError(e instanceof ApiError ? e.message : 'Search failed'); }
+    catch (e) { setError(e instanceof ApiError ? e.message : 'We could not search customers. Please try again.'); }
   }
   async function add() {
     setError(''); setMsg('');
@@ -23,11 +24,12 @@ export default function StaffCustomers() {
       setMsg('Customer added.');
       setForm({ first_name: '', preferred_name: '', phone: '', email: '' });
       search();
-    } catch (e) { setError(e instanceof ApiError ? e.message : 'Could not add customer'); }
+    } catch (e) { setError(e instanceof ApiError ? e.message : 'We could not add this customer. Please try again.'); }
   }
 
   return (
     <div>
+      <BackLink href="/staff" label="Back to overview" />
       <PageHeader kicker="CRM" title="Customers" sub="Search by name or phone, or register someone new in seconds." />
       <div className="grid md:grid-cols-2 gap-3">
         <div className="card">
