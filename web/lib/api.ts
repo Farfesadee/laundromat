@@ -44,7 +44,7 @@ async function req<T>(path: string, init?: RequestInit, token?: string | null): 
 }
 
 export const api = {
-  get: <T,>(path: string, token?: string | null) => req<T>(path, undefined, token),
+  get: <T,>(path: string, token?: string | null) => req<T>(path, { cache: 'no-store' }, token),
   post: <T,>(path: string, body: unknown, token?: string | null) =>
     req<T>(path, { method: 'POST', body: JSON.stringify(body ?? {}) }, token),
   put: <T,>(path: string, body: unknown, token?: string | null) =>

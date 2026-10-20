@@ -19,7 +19,7 @@ from datetime import datetime, timedelta, timezone
 from urllib.parse import quote, urlencode
 
 import httpx
-from fastapi import APIRouter, Depends, HTTPException, Request
+from fastapi import APIRouter, Depends, HTTPException, Request, Response
 from fastapi.responses import RedirectResponse
 from sqlalchemy import func
 from sqlalchemy.exc import IntegrityError
@@ -96,8 +96,9 @@ def register(body: RegisterIn, request: Request, db: Session = Depends(get_db)):
 
 
 @router.get("/providers")
-def auth_providers():
+def auth_providers(response: Response):
     """Public capability list used by the sign in screen."""
+    response.headers["Cache-Control"] = "no-store"
     return {
         "password": True,
         "google": settings.google_oauth_configured,

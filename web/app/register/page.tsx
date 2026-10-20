@@ -1,11 +1,11 @@
 'use client';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import type { ChangeEvent, FormEvent } from 'react';
 import Link from 'next/link';
-import { ApiError, api, tokens } from '../../lib/api';
+import { API_BASE, ApiError, api, tokens } from '../../lib/api';
 import { useAuth } from '../../lib/auth';
 import { AuthShell } from '../../components/auth-shell';
-import { CheckCircleIcon } from '../../components/icons';
+import { CheckCircleIcon, GoogleIcon } from '../../components/icons';
 import { PhoneField, isValidPhoneNumber } from '../../components/phone-field';
 
 const emptyForm = {
@@ -24,6 +24,22 @@ export default function Register() {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
+  const [googleEnabled, setGoogleEnabled] = useState(false);
+
+  useEffect(() => {
+    let active = true;
+    api
+      .get<{ google: boolean }>('/auth/providers')
+      .then((providers) => {
+        if (active) setGoogleEnabled(Boolean(providers.google));
+      })
+      .catch(() => {
+        if (active) setGoogleEnabled(false);
+      });
+    return () => {
+      active = false;
+    };
+  }, []);
 
   const set = (key: keyof typeof form) => (event: ChangeEvent<HTMLInputElement>) => {
     setForm((current) => ({ ...current, [key]: event.target.value }));
@@ -86,6 +102,14 @@ export default function Register() {
     setBusy(false);
   }
 
+  function googleSignup() {
+    if (!API_BASE) {
+      setError('Google sign up is not available in this environment.');
+      return;
+    }
+    window.location.href = `${API_BASE}/auth/google/start`;
+  }
+
   return (
     <AuthShell
       image="/images/laundry-water.jpg"
@@ -103,6 +127,20 @@ export default function Register() {
       <p className="mt-2 text-xs text-muted">
         <span className="req">*</span> Required field
       </p>
+
+      {googleEnabled && (
+        <>
+          <button type="button" onClick={googleSignup} className="btn btn-ghost mt-6 w-full">
+            <GoogleIcon className="h-5 w-5" />
+            Continue with Google
+          </button>
+          <div className="mt-5 flex items-center gap-3 text-[10px] font-semibold uppercase tracking-[0.2em] text-muted">
+            <span className="h-px flex-1 bg-line" />
+            or create with email
+            <span className="h-px flex-1 bg-line" />
+          </div>
+        </>
+      )}
 
       <form className="mt-6 space-y-4" onSubmit={submit} noValidate>
         <div className="grid gap-4 sm:grid-cols-2">
@@ -174,7 +212,7 @@ export default function Register() {
           required
         />
 
-        <div className="grid gap-4 sm:grid-cols-2">
+        <div className="space-y-4">
           <div>
             <label htmlFor="password" className="label mb-1.5 block">
               Password

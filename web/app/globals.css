@@ -70,15 +70,15 @@
   }
 
   .btn {
-    @apply inline-flex items-center justify-center gap-2 rounded-lg bg-ink px-5 py-3 text-sm font-semibold text-white transition hover:bg-accent active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-50;
+    @apply inline-flex items-center justify-center gap-2 rounded-lg bg-ink px-5 py-3 text-sm font-semibold text-white transition hover:bg-accent-soft hover:text-ink active:bg-[#d9e8e6] active:text-ink active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-50;
   }
 
   .btn-aqua {
-    @apply bg-accent hover:bg-accent-dark;
+    @apply bg-accent hover:bg-[#14707a] hover:text-white active:bg-accent-dark active:text-white;
   }
 
   .btn-amber {
-    @apply bg-brass text-white hover:bg-[#967441];
+    @apply bg-brass text-white hover:bg-[#967441] hover:text-white active:bg-[#85663a] active:text-white;
   }
 
   .btn-ghost {
@@ -90,7 +90,7 @@
   }
 
   .btn-outline-light {
-    @apply border border-white/30 bg-transparent text-white hover:bg-white/10;
+    @apply border border-white/30 bg-transparent text-white hover:bg-white/10 hover:text-white active:bg-white/20 active:text-white;
   }
 
   .btn-sm {
