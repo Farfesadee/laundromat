@@ -44,7 +44,7 @@ export function AuthShell({
           </div>
         </div>
 
-        <div className="flex flex-col justify-center p-6 sm:p-10 xl:p-12">
+        <div className="flex min-w-0 flex-col justify-center p-6 sm:p-10 xl:p-12">
           <div className="mb-8 flex items-center justify-between">
             <Link href="/" className="inline-flex lg:hidden" aria-label="LAUNDROMAT home">
               <Logo />
